@@ -1,0 +1,78 @@
+		<html>
+			<head>
+				<title>New Development Project</title>
+				<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+				<!-- comes from http://github.com/xxxx -->
+				<script src="lib/js/JiraApi.js"></script>
+				<script src="js/NuxeoRoadmap.js"></script>
+				<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+
+		<!-- Optional theme -->
+		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css">
+			</head>
+			<body data-spy="scroll" data-target="#myScrollspy">
+				
+			
+		   <div class="row">
+			 <img src="./img/NuxeoPlatform.png" alt="Nuxeo Platform" class="img-circle pull-right" width ="25%">
+			 
+			         <div class="jumbotron" >
+
+			        <h1>Nuxeo Plaform Roadmap</h1>
+			        <p class="lead  ">Monitor the evolution of the platform!</p>
+			      <p class="small"> <span class="label label-success ">Released</span>
+<span class="label label-info">Current iteration</span>
+<span class="label label-warning">Futur iteration</span>
+ FT= Fast Track LTS= Long Term Support</p> 
+
+			        </div>
+			  
+			    
+			
+			</div>
+			 
+			  
+			
+
+
+			 <div class="row">
+			 
+		
+			 <div class="col-md-12" id="placeholder"> 
+			
+
+
+
+			 </div>
+		
+				
+				</div>
+
+				
+
+			</body>
+			<script>
+			    var versionsIds ;
+
+			    var ja = new JiraApi("https://jira.nuxeo.com",true);
+			    function fillUpVersions (data){
+
+			  for (i =0;i<versionsIds.length;i++)	{
+			  	roadmapItemsListOfIds.concat(data.issues);
+			  	
+					ja.getVersion(function(data) {if (typeof(data.issues[0]) !== "undefined") {
+
+	if (typeof(data.issues[0].fields) !== "undefined") {
+
+		
+						;document.getElementById("version-"+data.issues[0].fields.fixVersions[0].id).innerHTML=formatRoadmapItemsList(data.issues)}}}, "NXROADMAP", versionsIds[i]);
+
+				}}
+
+				ja.getVersions(function(data) {filteredData=filterOutUselessVersions(data); versionsIds= getListOfVersionIds(filteredData);document.getElementById("placeholder").innerHTML=formatVersions(filteredData);fillUpVersions()}, "NXROADMAP"); 
+
+		    </script>
+		</html>
