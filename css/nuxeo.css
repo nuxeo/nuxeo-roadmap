@@ -1,0 +1,50 @@
+body, h1 {
+  font-family: "Avenir Next", Arial, sans-serif;
+}
+
+h1 {
+  font-weight: 600;
+  }
+
+.nav-tabs > li > a, .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus, .nav-tabs > li > a:hover {
+  background-color: transparent;
+  border-color: transparent;
+  text-align: center;
+  text-decoration: none;
+  color:white;
+}
+/* ajouter un span*/
+.nav-tabs > li > a {
+  font-weight: 500;
+}
+
+.nav-tabs > li > a:hover {
+  text-decoration: underline;
+}
+
+.nav-tabs > li {
+  margin:10px 0 10px 20px;
+}
+
+.jumbotron {
+  background-color: white;
+  padding-top:0;
+  padding-bottom: 10px;
+}
+
+.alert {
+  border:none;
+}
+
+.alert-info, .label-info {
+  background-color: #00adff;
+}
+
+.alert-warning, .label-warning {
+  background-color: #FFBA0D;
+}
+/*
+.alert-success, .label-success {
+  background-color: #00E84F;
+}
+*/
