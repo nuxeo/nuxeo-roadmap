@@ -65,12 +65,16 @@
 	            panelClass = "alert alert-success"
 	        };
 	        classAttribute = "class=\"" + panelClass + "\"";
+                var icon ="";
+                if (jSONVersions[i].name.indexOf("LTS") == 0 ) {
+                   icon = "<img src='img/lts.png'/>";
+	        } else if (jSONVersions[i].name.indexOf("FT") == 0 ) {
+                    icon = "<img src='img/ft.png'/>";
+                }
 	        htmlOutput = htmlOutput + "\
-            <li " + classAttribute + " ><a href=\"#version-" + jSONVersions[i].id + "\" data-toggle=\"tab\">" + jSONVersions[i].name + " <br/>(" + formatDate(jSONVersions[i].releaseDate) + ")</a></li>";
-
-	    }
-
-	    htmlOutput = htmlOutput + "</ul>";
+            <li " + classAttribute + " ><a href=\"#version-" + jSONVersions[i].id + "\" data-toggle=\"tab\">" + icon + jSONVersions[i].name + " <br/>(" + formatDate(jSONVersions[i].releaseDate) + ")</a>";
+            }
+	    htmlOutput = htmlOutput + "</li></ul>";
 	    htmlOutput += "<div id=\"myTabContent\"class=\"tab-content \">";
 
 	    for (i = 0; i < jSONVersions.length; i++) {
