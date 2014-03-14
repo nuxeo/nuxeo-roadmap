@@ -38,31 +38,7 @@
 
 	}
 
-	function formatVersionsOldUsingPanels(jSONVersions){
-		
-		var htmlOutput="";
-		var currentVersion=true;
-		var nextCurrentVersion=false;
-		for(i=0;i<jSONVersions.length;i++){
-
-			var panelClass="panel panel-warning";
-		if(nextCurrentVersion) {panelClass="panel panel-info"; nextCurrentVersion=false}
-        if (jSONVersions[i].released) {currentVersion=false;nextCurrentVersion=true;panelClass="panel panel-success"};
-
-			htmlOutput=  htmlOutput+"<div class=\""+panelClass+"\"> \
-	  <div class=\"panel-heading\"> \
-	    <h6 class=\"panel-title\">"+jSONVersions[i].name+" ("+jSONVersions[i].releaseDate+") </h6> \
-	  </div> \
-	  <div id=\"version-"+jSONVersions[i].id+"\"	 class=\"panel-body\"> \
-	    Panel content \
-	  </div> \
-	</div>" 
-
-		}
-		
-		return htmlOutput;
-
-	}
+	
 
 function formatDate(dateToFormat){
 	var theDate= new Date(dateToFormat);
@@ -106,7 +82,6 @@ function formatDate(dateToFormat){
 		var result="";
 
 
-
 //summary
 result ="<div class=\"panel-group\" id=\"accordion\">";
  for (i=0;i<roadmapItemsList.length;i++){
@@ -121,15 +96,15 @@ result ="<div class=\"panel-group\" id=\"accordion\">";
 		menuItem="<div class=\"panel panel-default\"> <div class=\"panel-heading\"> <h4 class=\"panel-title\">";
 		if (isRoadmapItemResolved) {menuItem+="<span class=\"glyphicon glyphicon-check\"></span> ";}
 		else {menuItem+="<span class=\"glyphicon glyphicon-unchecked\"></span> ";};
-		menuItem+= "<a data-toggle=\"collapse\" data-parent=\"#accordion\" href=\"#item-"+roadmapItem.id+"\">";
-		menuItem+=roadmapItem.fields.summary+"</a>";
+		//menuItem+= "<a data-toggle=\"\" data-parent=\"#accordion\" href=\"#item-"+roadmapItem.id+"\">";
+		menuItem+=roadmapItem.fields.summary;
 		menuItem+=generateAvailabeIcons(roadmapItem);
         menuItem+="</div>";
-		menuItem+= "<div id=\"item-"+roadmapItem.id+"\" class=\"panel-collapse collapse\"><div class=\"panel-body\">";
+		menuItem+= "<div class=\"panel-body\">";
 		
 		menuItem+="<p>";
 		menuItem+=roadmapItem.fields.description;
-		menuItem+="</p></div></div></div>";
+		menuItem+="</p></div></div>";
 		result=result+menuItem;
 	}
 	result=result+"</div>";
@@ -164,6 +139,7 @@ function generateAvailabeIcons(roadmapItem){
     
         
 }
+
 
 
 
