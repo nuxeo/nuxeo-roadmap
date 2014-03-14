@@ -1,84 +1,60 @@
-		<html>
-			<head>
-				<title>New Development Project</title>
-				<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
-				<!-- comes from http://github.com/xxxx -->
-				<script src="lib/js/JiraApi.js"></script>
-				<script src="js/NuxeoRoadmap.js"></script>
-				<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-				<script type="text/javascript" src="http://www.nuxeo.com/extension/nuxeo_design/design/nuxeo/javascript/xnav_get.js" charset="utf-8"></script>
+<html>
+  <head>
+    <title>Nuxeo Platform Roadmap</title>
+    <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+    <!-- comes from http://github.com/xxxx -->
+    <script src="lib/js/JiraApi.js"></script>
+    <script src="js/NuxeoRoadmap.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="http://www.nuxeo.com/extension/nuxeo_design/design/nuxeo/javascript/xnav_get.js" charset="utf-8"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootswatch/3.1.1/yeti/bootstrap.min.css">
+    <!-- Custom nuxeo -->
+    <link rel="stylesheet" href="css/nuxeo.css">
+  </head>
+  <body data-spy="scroll" data-target="#myScrollspy">
+    <div class="row">
+      <div class="jumbotron" >
+        <h1>Nuxeo Plaform Roadmap</h1>
+        <p class="lead  ">Monitor the evolution of the platform!</p>
+        <p class="small"> <span class="label label-success ">Released</span>
+          <span class="label label-info">Current iteration</span>
+          <span class="label label-warning">Futur iteration</span>
+          FT= Fast Track LTS= Long Term Support
+        </p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12" id="placeholder"> 
+      </div>
+    </div>
 
-		<!-- Latest compiled and minified CSS -->
-		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-		<!-- Optional theme -->
-		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootswatch/3.1.1/yeti/bootstrap.min.css"> 
-		
-		<!-- Custom nuxeo -->
-		<link rel="stylesheet" href="css/nuxeo.css"> 
-		
-		
+  <script>
+    var versionsIds;
+    var ja = new JiraApi("https://jira.nuxeo.com", true);
+    
+    function fillUpVersions(data) {
+    
+        for (i = 0; i < versionsIds.length; i++) {
+            ja.getVersion(function (data) {
+                if (typeof (data.issues[0]) !== "undefined") {
+                    if (typeof (data.issues[0].fields) !== "undefined") {
+                        document.getElementById("version-" + data.issues[0].fields.fixVersions[0].id).innerHTML = formatRoadmapItemsList(data.issues);
+                    }
+                }
+            }, "NXROADMAP", versionsIds[i]);
+        }
+    }
 
-			</head>
-			<body data-spy="scroll" data-target="#myScrollspy">
-				
-			
-		   <div class="row">
-			 
-			         <div class="jumbotron" >
+    ja.getVersions(function (data) {
+        filteredData = filterOutUselessVersions(data);
+        versionsIds = getListOfVersionIds(filteredData);
+        document.getElementById("placeholder").innerHTML = formatVersions(filteredData);
+        fillUpVersions()
+    }, "NXROADMAP");
 
-			        <h1>Nuxeo Plaform Roadmap</h1>
-			        <p class="lead  ">Monitor the evolution of the platform!</p>
-			      <p class="small"> <span class="label label-success ">Released</span>
-<span class="label label-info">Current iteration</span>
-<span class="label label-warning">Futur iteration</span>
- FT= Fast Track LTS= Long Term Support</p> 
-
-			        </div>
-			  
-			    
-			
-			</div>
-			 
-			  
-			
-
-
-			 <div class="row">
-			 
-		
-			 <div class="col-md-12" id="placeholder"> 
-			
-
-
-
-			 </div>
-		
-				
-				</div>
-
-				
-
-			</body>
-			<script>
-
-			    var versionsIds ;
-
-			    var ja = new JiraApi("https://jira.nuxeo.com",true);
-			    function fillUpVersions (data){
-
-			  for (i =0;i<versionsIds.length;i++)	{
-			  	
-					ja.getVersion(function(data) {if (typeof(data.issues[0]) !== "undefined") {
-
-	if (typeof(data.issues[0].fields) !== "undefined") {
-
-		
-						;document.getElementById("version-"+data.issues[0].fields.fixVersions[0].id).innerHTML=formatRoadmapItemsList(data.issues)}}}, "NXROADMAP", versionsIds[i]);
-
-				}}
-
-				ja.getVersions(function(data) {filteredData=filterOutUselessVersions(data); versionsIds= getListOfVersionIds(filteredData);document.getElementById("placeholder").innerHTML=formatVersions(filteredData);fillUpVersions()}, "NXROADMAP"); 
-
-		    </script>
-		</html>
-
+  </script>
+  </body>
+</html>
