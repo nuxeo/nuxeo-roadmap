@@ -147,13 +147,13 @@
 
 
 	    icons = "<div class=\"btn-group pull-right\">";
-	    icons += sources != null ? "<button type=\"button\" class=\"btn btn-xs\"><a target =\"alt\" title=\"Link to sources\" href=\"" + sources + "\"><span class=\"glyphicon glyphicon-eye-open\"></span></a></button>" : "";
-	    icons += video != null ? "<button type=\"button\" class=\"btn btn-xs\"><a target =\"alt\" title=\"Link to a video\" href=\"" + video + "\"><span class=\"glyphicon glyphicon-film\"></span></a></button>" : "";
-	    icons += dev != null ? "<button type=\"button\" class=\"btn btn-xs\"><a target =\"alt\" title=\"Link to the developper documentation\" href=\"" + dev + "\"><span class=\"glyphicon glyphicon-book\"></span></a></button>" : "";
-	    icons += user_doc != null ? "<button type=\"button\" class=\"btn btn-xs\"><a target =\"alt\" title=\"Link to the user documentation\" href=\"" + user_doc + "\"><span class=\"glyphicon glyphicon-book\"></span></a></button>" : "";
-	    icons += install != null ? "<button type=\"button\" class=\"btn btn-xs\"><a target =\"alt\" title=\"Link to the install/setup documentation\" href=\"" + install + "\"><span class=\"glyphicon glyphicon-book\"></span></a></button>" : "";
-	    icons += blogpost != null ? "<button type=\"button\" class=\"btn btn-xs\"><a target =\"alt\" title=\"Link to a related blogpost\" href=\"" + dev + "\"><span class=\"glyphicon glyphicon-align-left\"></span></a></button>" : "";
-	    icons += "<button type=\"button\" class=\"btn btn-xs\"><a target =\"alt\" title=\"View/Edit on JIRA\" href=\"" + jira + "\"><span class=\"glyphicon glyphicon-edit\"></span></a></button>";
+	    icons += sources != null ? "<a target =\"_blank\" title=\"Link to sources\" href=\"" + sources + "\"><span class=\"glyphicon glyphicon-eye-open\"></span></a>" : "";
+	    icons += video != null ? "<a target =\"_blank\" title=\"Link to a video\" href=\"" + video + "\"><span class=\"glyphicon glyphicon-film\"></span></a>" : "";
+	    icons += dev != null ? "<a target =\"_blank\" title=\"Link to the developper documentation\" href=\"" + dev + "\"><span class=\"glyphicon glyphicon-book\"></span></a>" : "";
+	    icons += user_doc != null ? "<a target =\"_blank\" title=\"Link to the user documentation\" href=\"" + user_doc + "\"><span class=\"glyphicon glyphicon-book\"></span></a>" : "";
+	    icons += install != null ? "<a target =\"_blank\" title=\"Link to the install/setup documentation\" href=\"" + install + "\"><span class=\"glyphicon glyphicon-book\"></span></a>" : "";
+	    icons += blogpost != null ? "<a target =\"_blank\" title=\"Link to a related blogpost\" href=\"" + dev + "\"><span class=\"glyphicon glyphicon-align-left\"></span></a>" : "";
+	    icons += "<a target =\"_blank\" title=\"View/Edit on JIRA\" href=\"" + jira + "\"><span class=\"glyphicon glyphicon-edit\"></span></a>";
 
 
 	    icons += "</div>";
