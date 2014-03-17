@@ -52,18 +52,20 @@
 	    var htmlOutput = "<ul id=\"myTab\" class=\"nav nav-tabs\">";
 	    var currentVersion = true;
 	    var nextCurrentVersion = false;
+	    var currentReleaseIndex;
 	    for (i = 0; i < jSONVersions.length; i++) {
 	        var panelClass = "alert alert-warning";
 	        var classAttribute = "";
 	        if (nextCurrentVersion) {
 	            panelClass = "alert alert-info";
-	            nextCurrentVersion = false
-	        };
+	            nextCurrentVersion = false;
+                    currentReleaseIndex = i;
+	        }
 	        if (jSONVersions[i].released) {
 	            currentVersion = false;
 	            nextCurrentVersion = true;
-	            panelClass = "alert alert-success"
-	        };
+	            panelClass = "alert alert-success";
+	        }
 	        classAttribute = "class=\"" + panelClass + "\"";
                 var icon ="";
                 if (jSONVersions[i].name.indexOf("LTS") == 0 ) {
@@ -78,7 +80,7 @@
 	    htmlOutput += "<div id=\"myTabContent\"class=\"tab-content \">";
 
 	    for (i = 0; i < jSONVersions.length; i++) {
-	        if (i == 0) {
+	        if (i == currentReleaseIndex) {
 	            htmlOutput = htmlOutput + " <div class=\"tab-pane fade in active\" id=\"version-" + jSONVersions[i].id + "\"></div>"
 	        } else {
 	            htmlOutput = htmlOutput + " <div class=\"tab-pane fade \" id=\"version-" + jSONVersions[i].id + "\"></div>"
