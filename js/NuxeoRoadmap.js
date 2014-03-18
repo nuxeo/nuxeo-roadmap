@@ -74,7 +74,7 @@
                     icon = "<img src='img/ft.png'/>";
                 }
 	        htmlOutput = htmlOutput + "\
-            <li " + classAttribute + " ><a href=\"#version-" + jSONVersions[i].id + "\" data-toggle=\"tab\">" + icon + jSONVersions[i].name + " <br/>(" + formatDate(jSONVersions[i].releaseDate) + ")</a>";
+            <li " + classAttribute + " ><a href=\"#version-" + jSONVersions[i].id + "\" data-toggle=\"tab\">" + icon + " <span>" + jSONVersions[i].name + " </span><small>(" + formatDate(jSONVersions[i].releaseDate) + ")</small></a>";
             }
 	    htmlOutput = htmlOutput + "</li></ul>";
 	    htmlOutput += "<div id=\"myTabContent\"class=\"tab-content \">";
