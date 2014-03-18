@@ -57,7 +57,7 @@
 	        var panelClass = "alert alert-warning";
 	        var classAttribute = "";
 	        if (nextCurrentVersion) {
-	            panelClass = "alert alert-info";
+	            panelClass = "alert alert-info active";
 	            nextCurrentVersion = false;
                     currentReleaseIndex = i;
 	        }
