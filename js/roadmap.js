@@ -71,14 +71,12 @@
 	}])
 
 	.filter('priority', function() {
-		return function(issues, desc) {
+		return function(issues) {
 			if(! issues) {
 				return issues;
 			}
 
-			// Required for 
-			var filtereds = issues;
-			filtereds.sort(function(x, y) {
+			issues.sort(function(x, y) {
 				// Sort by prority id
 				var sort =  x.fields.priority.id - y.fields.priority.id;
 				// If equals sort by creation order (id)
@@ -89,7 +87,7 @@
 				return sort;
 			});
 
-			return filtereds;
+			return issues;
 		}
 	})
 

@@ -37,11 +37,21 @@
           <h2>Monitor the evolution of the platform!</h2>
         </div>
       </div>
-      <div class="well col-md-2">
-        <p>
+      <div class="well col-md-2 row">
+        <div class="col-md-7">
           <span class="label label-info">Current iteration</span>
           <span class="label label-warning">Future iteration</span>
-        </p>
+        </div>
+        <div class="col-md-5">
+          <div class="row">
+            Blocker <img src="https://jira.nuxeo.com/images/icons/priorities/blocker.png" height="16">
+          </div>
+          <div class="row">
+            Major   <img src="https://jira.nuxeo.com/images/icons/priorities/critical.png" height="16">
+          </div>
+          <div class="row">
+            Minor   <img src="https://jira.nuxeo.com/images/icons/priorities/minor.png" height="16">
+          </div>
       </div>
     </div>
     <div class="row" id="placeholder" ng-controller="root">
@@ -68,7 +78,7 @@
         </div>
       </div>
       <div class="col-md-9" id="issues" ng-controller="issues">
-        <div class="row" ng-controller="components" style="margin-bottom: 20px">
+        <div class="row" ng-controller="components" style="margin-bottom: 28px">
           <select class="col-md-12" multiple="multiple" id="components">
             <option value="{{cmp.id}}" ng-repeat="cmp in components">{{cmp.name}}</option>
           </select>
