@@ -57,7 +57,7 @@ h2 {
   margin:10px 10px;
   margin-left:5px;
   display: block;
-  white-space: pre;
+  /*white-space: pre; */
   /*  -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; */
 }  
 
@@ -139,7 +139,64 @@ h2 {
   border:none;
 }
 
-#myTabContent {
+#jira-version-issues {
  margin-top: 10px;
  padding:0 20px;
+}
+
+
+/*
+
+*/
+
+.loader {
+  width: 50%;
+  margin: auto;
+  margin-bottom: 25px;
+  background: rgb(145, 145, 145);
+}
+
+.loader img {
+  margin: auto;
+  display: block;
+  width: 64px;
+  height: 64px;
+}
+
+
+/* Override bootstrap css */
+
+#placeholder .list-group-item {
+  border: none !important;
+  margin-bottom: 0px;
+  border-bottom: 1px solid #E8E8E8 !important;
+  font-size: 125%;
+  padding: Opx;
+}
+
+
+#placeholder .list-group {
+  margin-bottom: 0px;
+}
+
+#placeholder .badge {
+  background-color: white;
+  margin-left: 30px;
+  border: 1px solid #D6D6D6;
+  color: #777777;
+}
+
+#placeholder .list-group-item .badge {
+
+}
+
+#issues .badge {
+  background-color: #FAE6E6; 
+  color: rgb(45, 45, 45);
+  border: 1px solid #EBB0B0;
+  letter-spacing: 0px;
+}
+
+#issues .badge:hover {
+  cursor: pointer;
 }
