@@ -6,9 +6,6 @@ NETWORK:
 CACHE:
 //code.jquery.com/jquery-1.10.2.min.js
 
-lib/zip/jszip.min.js
-lib/zip/jszip_utils.js
-
 //netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js
 
 //cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.jquery.min.js
@@ -20,7 +17,10 @@ lib/zip/jszip_utils.js
 //netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css
 //netdna.bootstrapcdn.com/bootswatch/3.1.1/yeti/bootstrap.min.css
 
-css/nuxeo.css
+
+lib/jszip.packaged.min.js
+
+css/nuxeo.min.css
 
 img/loader.svg
 img/lts_.png

@@ -110,7 +110,7 @@
 	.filter('reduce', function() {
 		return function(issues, versions, selection) {
 			// Components to filter
-			var components = selection.components || [];
+			var components 	= selection.components || [];
 			// Versions to filter
 			var versionsIds = [];
 			if(selection.version) {
