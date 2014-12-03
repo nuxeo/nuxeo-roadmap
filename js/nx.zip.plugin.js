@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Jquery zip plugin
  *

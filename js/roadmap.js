@@ -1,4 +1,17 @@
+'use strict';
+
 (function() {
+	/* 
+	 * lookup method used to retrieve and cache jquery selections.
+	 * !!! Build for being used only for statics elements (element lookup that will never change) !!!
+	 */
+	var lookup = function() {
+		var _cache = {};
+		return function (selector) {
+			return _cache[selector] || (_cache[selector] = $(selector));
+		};
+	}();
+
 
 	// Issues (all) cache
 	var CACHE 		= [];
@@ -9,6 +22,7 @@
 		COMPONENTS_LOADED 			: 'components.loaded',
 		FILTER_BY_SELECTION			: 'filter.selection'
 	};
+
 
 	// Roadmap module
 	angular.module('nxroadmap', [])
@@ -58,7 +72,8 @@
 				return selection;
 			},
 			getComponentsSelection: function() {
-				return $('#components').chosen().val();
+				return lookup('#components').chosen().val();
+//				return $('#components').chosen().val();
 			},
 			// Get global selection object
 			getSelection: function() {
@@ -216,7 +231,8 @@
 
 				// Defer components change binding
 				$timeout(function() {
-					$('#components').chosen({
+					//$('#components').chosen({
+					lookup('#components').chosen({
 						placeholder_text_multiple: 'Select component(s) for issues filtering'
 					}).change(function() {
 						$scope.filterIssuesByComponents();
