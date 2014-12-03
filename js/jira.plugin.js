@@ -12,7 +12,6 @@
 		this.baseURL 		= url;
 		this.searchURL 		= url + '/rest/api/latest/search';
 		this.conditions 	= [];
-		this.filters 		= [];
 		this.letterRegex 	= /[A-Z]/i;
 	};
 	Search.prototype.project = function(projectName) {
@@ -27,10 +26,6 @@
 		}
 
 		this.condition(null, 'ORDER+BY', '+' + properties.join(','), '+' + sens.toUpperCase());
-		return this;
-	};
-	Search.prototype.max = function(max) {
-		this.filters.push('maxResults=' + max);
 		return this;
 	};
 	Search.prototype.condition = function(property, operator, value, suffix) {
@@ -122,6 +117,7 @@
         }
 
         self = this;
+
         // Filter versions
         data = $.grep(data, function(version, i) {
         	version.jsDate = new Date(version.releaseDate);
@@ -142,13 +138,13 @@
 
         // Initial versions
         this.data        = data;
+        // Ids of versions (flat version of versionsIds)
         this.ids 		 = [];
-        this.idsMap		 = {};
         // All lts
         this.lts         = [];
         // LTS map where the key is an LTS id and the values an array of FT
         this.versions    = {};
-        // Same as versions but with just the ids
+        // Same as versions but just with the ids
         this.versionsIds = {};
         // Eagerly load the versions
         this.load();
@@ -162,8 +158,7 @@
 
         var self = this;
         $.each(this.data, function(idx, version) {
-        	// Cache all ids
-        	self.idsMap[version.id] = version;
+        	// Cache ids
         	self.ids.push(version.id);
 
             if(version.is_lts) {

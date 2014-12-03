@@ -52,11 +52,13 @@
                     if(filter && typeof filter.test === 'function') {
                         console.log('A filter has been detected ... process filter');
                         // Iter on each files and check the filter
-                        $.each(zip.files, function(i, file) {
+                        for(var i in zip.files) {
+                            var file = zip.files[i];
+                            // Check if the file pass the filter
                             if(filter.test(file.name)) {
                                 files.push(file);
                             }
-                        });  
+                        }
                     }
                     else {
                         files = zip.files;
