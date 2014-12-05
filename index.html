@@ -60,7 +60,7 @@
               <div id="collapse-{{version.id}}" class="panel-collapse collapse" role="tabpanel">
                 <div class="panel-body list-group">
                   <a href="" data-version="{{ft.id}}" ng-click="filterIssuesByVersion(ft.id, true)" class="list-group-item" ng-repeat="ft in versions.getVersions(version.id)">
-                    {{ft.name}} <span class="badge">{{ft.jsDate | date: 'longDate' }}</span> <span class="badge" ng-if="ft.current">current</span>
+                    {{ft.name}} <span class="badge">{{ft.jsDate | date: 'longDate' }}</span> <span class="glyphicon glyphicon-ok" ng-if="ft.released"></span> <span class="badge" ng-if="ft.current">current</span>
                   </a>
                 </div>
               </div>
@@ -80,7 +80,7 @@
                 <h4 class="panel-title">
                   {{issue.fields.summary}}
                   <div class="btn-group pull-right">             
-                    <span ng-repeat="fixVersion in issue.fields.fixVersions" ng-click="filterIssuesByVersion(fixVersion.id, true)" class="badge glyphicon">{{fixVersion.name}}</span>
+                    <span ng-repeat="fixVersion in issue.fields.fixVersions" ng-click="filterIssuesByVersion(fixVersion.id, true)" class="badge glyphicon">{{fixVersion.name}}</span>                    
                     
                     <a ng-if="issue.fields.customfield_10902" target="_blank" title="Link to sources" href="{{issue.fields.customfield_10902}}"><span class="glyphicon glyphicon-eye-open"></span></a>
                     <a ng-if="issue.fields.customfield_10903" target="_blank" title="Link to a video" href="{{issue.fields.customfield_10903}}"><span class="glyphicon glyphicon-film"></span></a>
