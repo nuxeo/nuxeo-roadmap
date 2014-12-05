@@ -117,20 +117,25 @@
         }
 
         self = this;
+        self.activeVersionId = null;
 
         // Filter versions
         data = $.grep(data, function(version, i) {
         	version.jsDate = new Date(version.releaseDate);
-			version.is_lts    = version.name.indexOf('LTS') === 0;
+			version.is_lts = version.name.indexOf('LTS') === 0;
 
-            var currentDate = new Date();
-            // Check if the version is for this month
-            if(version.jsDate.getYear() === currentDate.getYear() && version.is_lts) {
-                version.panel = 'info';
+            var currentDate  = new Date();
+            var startingDate = new Date(version.jsDate.getFullYear(), version.jsDate.getMonth() - 2, version.jsDate.getDay() + 1);
+
+            if(version.released && version.is_lts) {
+                version.panel = 'success';
             }
-            // Else check if it's a futur version
-            else if(version.jsDate.getTime() > currentDate.getTime() && version.is_lts) {
+            else {
                 version.panel = 'warning';
+                if(startingDate <= currentDate && currentDate <= version.jsDate) {
+                    version.current = true;
+                    self.activeVersionId = version.id;
+                }
             }
 
         	return self.isDisplayableVersion(version);
@@ -182,6 +187,11 @@
                 // to inverse: versions.reverse()
                 self.versions[version.id] = versions;
                 self.versionsIds[version.id] = versionsIds;
+
+                // Check active version id lts - and if found set the lts panel type to info because it contains the active FT
+                if($.inArray(self.activeVersionId, versionsIds) !== -1) {
+                    version.panel = 'info';
+                }
             }
         });
 

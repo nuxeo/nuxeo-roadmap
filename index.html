@@ -72,7 +72,7 @@
               <div id="collapse-{{version.id}}" class="panel-collapse collapse" role="tabpanel">
                 <div class="panel-body list-group">
                   <a href="" data-version="{{ft.id}}" ng-click="filterIssuesByVersion(ft.id, true)" class="list-group-item" ng-repeat="ft in versions.getVersions(version.id)">
-                    {{ft.name}} <span class="badge">{{ft.jsDate | date: 'longDate' }}</span>
+                    {{ft.name}} <span class="badge">{{ft.jsDate | date: 'longDate' }}</span> <span class="badge" ng-if="ft.current">current</span>
                   </a>
                 </div>
               </div>
