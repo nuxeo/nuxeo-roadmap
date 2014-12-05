@@ -36,27 +36,15 @@
   <body data-spy="scroll" data-target="#myScrollspy" ng-app="nxroadmap">
     <div class="row">
       <div class="jumbotron">
-        <div class="col-md-10">
+        <div class="col-md-11">
           <h1>Nuxeo Platform Roadmap</h1>
           <h2>Monitor the evolution of the platform!</h2>
         </div>
       </div>
-      <div class="well col-md-2 row">
-        <div class="col-md-7">
-          <span class="label label-info">Current iteration</span>
-          <span class="label label-warning">Future iteration</span>
-        </div>
-        <div class="col-md-5">
-          <div class="row">
-            Blocker <img src="https://jira.nuxeo.com/images/icons/priorities/blocker.png" height="16">
-          </div>
-          <div class="row">
-            Major   <img src="https://jira.nuxeo.com/images/icons/priorities/critical.png" height="16">
-          </div>
-          <div class="row">
-            Minor   <img src="https://jira.nuxeo.com/images/icons/priorities/minor.png" height="16">
-          </div>
-      </div>
+      <div class="well col-md-1">
+        <span class="label label-success">Released</span>                
+        <span class="label label-info">Current iteration</span>
+        <span class="label label-warning">Future iteration</span>        
     </div>
     <div class="row" id="placeholder" ng-controller="root">
       <div class="col-md-3" id="versions" ng-controller="versions">
@@ -91,9 +79,7 @@
               <div class="panel-heading">
                 <h4 class="panel-title">
                   {{issue.fields.summary}}
-                  <div class="btn-group pull-right">
-                    <img height="20" src="{{issue.fields.priority.iconUrl}}" alt="{{issue.priority.name}}"></img>
-                    
+                  <div class="btn-group pull-right">             
                     <span ng-repeat="fixVersion in issue.fields.fixVersions" ng-click="filterIssuesByVersion(fixVersion.id, true)" class="badge glyphicon">{{fixVersion.name}}</span>
                     
                     <a ng-if="issue.fields.customfield_10902" target="_blank" title="Link to sources" href="{{issue.fields.customfield_10902}}"><span class="glyphicon glyphicon-eye-open"></span></a>
