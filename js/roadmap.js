@@ -33,19 +33,19 @@
 			getVersions: function(callback) {
 				return $.jira('versions', {
 					'project': 'NXROADMAP',
-					'url': 'http://jira.nuxeo.com'
+					'url': 'https://jira.nuxeo.com'
 				}).done(callback);
 			},
 			getComponents: function(callback) {
 				return $.jira('components', {
 					'project': 'NXROADMAP',
-					'url': 'http://jira.nuxeo.com'
+					'url': 'https://jira.nuxeo.com'
 				}).done(callback);
 			},
 			getIssues: function(versions, callback) {
 				return $.jira('issues', {
 					'project'	: 'NXROADMAP',
-					'url'		: 'http://jira.nuxeo.com',
+					'url'		: 'https://jira.nuxeo.com',
 					'version'	: versions
 				}).done(callback);
 			}
