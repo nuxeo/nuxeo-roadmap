@@ -13,6 +13,8 @@
 		this.searchURL 		= url + '/rest/api/latest/search';
 		this.conditions 	= [];
 		this.letterRegex 	= /[A-Z]/i;
+		// URL parameters & separated
+		this.filters		= [];
 	};
 	Search.prototype.project = function(projectName) {
 		this.conditions = [];
@@ -27,6 +29,13 @@
 
 		this.condition(null, 'ORDER+BY', '+' + properties.join(','), '+' + sens.toUpperCase());
 		return this;
+	};
+	Search.prototype.filter = function(property, value) {
+		this.filters.push(property + '=' + value);
+		return this;
+	};
+	Search.prototype.expand = function(value) {
+		return this.filter('expand', value);
 	};
 	Search.prototype.condition = function(property, operator, value, suffix) {
 		this.conditions.push(
@@ -87,6 +96,7 @@
 	Search.prototype.toURL = function() {
 		var url = this.searchURL + '?jql=';
 		url += this.conditions.join('+');
+		url += '&' + this.filters.join('&');
 
 		return url;
 	};
@@ -234,6 +244,7 @@
 							.project(options.project)
 							.and()
 							.isIn('fixversion', versions)
+							.expand('renderedFields')
 							.toURL();
 
 				return $.when($.get(url));
