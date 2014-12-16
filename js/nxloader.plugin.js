@@ -23,7 +23,6 @@
 			if(typeof options.callback === 'function') {
 				options.callback(self);
 			}
-
 		}
 
 		return this;

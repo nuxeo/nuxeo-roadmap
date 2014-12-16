@@ -202,3 +202,7 @@ h2 {
 #issues .badge:hover {
   cursor: pointer;
 }
+
+.chosen-container-multi .chosen-choices li.search-field input[type=text] {
+  height: 25px;
+}
