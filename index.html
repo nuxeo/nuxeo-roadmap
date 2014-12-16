@@ -78,9 +78,7 @@
               <div class="panel-heading">
                 <h4 class="panel-title">
                   {{issue.fields.summary}}
-                  <div class="btn-group pull-right">             
-                    <span ng-repeat="fixVersion in issue.fields.fixVersions" ng-click="filterIssuesByVersion(fixVersion.id, true)" class="badge glyphicon">{{fixVersion.name}}</span>                    
-                    
+                  <div class="btn-group pull-right">                                 
                     <a ng-if="issue.fields.customfield_10902" target="_blank" title="Link to sources" href="{{issue.fields.customfield_10902}}"><span class="glyphicon glyphicon-eye-open"></span></a>
                     <a ng-if="issue.fields.customfield_10903" target="_blank" title="Link to a video" href="{{issue.fields.customfield_10903}}"><span class="glyphicon glyphicon-film"></span></a>
                     <a ng-if="issue.fields.customfield_10899" target="_blank" title="Link to the developper documentation" href="{{issue.fields.customfield_10899}}"><span class="glyphicon glyphicon-book"></span></a>
@@ -88,6 +86,8 @@
                     <a ng-if="issue.fields.customfield_10901" target="_blank" title="Link to the install/setup documentation" href="{{issue.fields.customfield_10901}}"><span class="glyphicon glyphicon-book"></span></a>
                     <a ng-if="issue.fields.customfield_10904" target="_blank" title="Link to a related blogpost" href="{{issue.fields.customfield_10904}}"><span class="glyphicon glyphicon-align-left"></span></a>
                     <a target="_blank" title="View/Edit on JIRA" href="http://jira.nuxeo.com/browse/{{issue.key}}"><span class="glyphicon glyphicon-edit"></span></a>
+
+                    <span ng-repeat="fixVersion in issue.fields.fixVersions" ng-click="filterIssuesByVersion(fixVersion.id, true)" class="badge glyphicon">{{fixVersion.name}}</span>
                   </div>
                 </h4>
               </div>
