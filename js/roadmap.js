@@ -7,12 +7,17 @@
 	 */
 	var lookup = function() {
 		var _cache = {};
-		return function (selector) {
-			return _cache[selector] || (_cache[selector] = $(selector));
+		return function (selector, rm) {
+			var elm = _cache[selector] || (_cache[selector] = $(selector));
+ 			if(rm === true) {
+ 				delete _cache[selector];
+ 			}
+
+			return elm;
 		};
 	}();
 
-
+	var ISSUE_LOADER_SELECTOR = '#issues-loader';
 	// Issues (all) cache
 	var CACHE 		= [];
 	// Event constants
@@ -215,6 +220,7 @@
 	.controller('versions', function($scope, $timeout, jira) {
 		// Load jira roadmap project versions
 		jira.getVersions(function(data, status) {
+			lookup(ISSUE_LOADER_SELECTOR).nxloader('show');
 			$scope.$apply(function() {
 				$scope.versions = $.jira('createVersions', data);
 				$scope.fireVersionsLoaded($scope.versions);
@@ -254,8 +260,16 @@
 			$scope.versions = versions;
 			jira.getIssues(versions.ids, function(data, status) {
 				$scope.$apply(function() {
-					// Filter issues by priority, cache them and bind the result on the scope
-					$scope.issues = CACHE = $filter('priority')(data.issues);
+					// Filter issues by priority
+					var filtereds = $filter('priority')(data.issues);
+					// Hide the issues loader (and remove this elm from the selector registry)
+					lookup(ISSUE_LOADER_SELECTOR, true).nxloader('hide', {
+						callback: function(elm) {
+							elm.remove();
+						}
+					});
+					// Cache filtereds issues and bind them on the scope
+					$scope.issues = CACHE = filtereds;
 					var ltsId = $('.panel-info div[role=tabpanel]')
 									.addClass('in')
 									.parent('.panel')

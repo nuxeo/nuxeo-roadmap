@@ -15,6 +15,7 @@
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.jquery.min.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.4/angular.min.js"></script>
     
+    <script type="text/javascript" src="js/nxloader.plugin.js"></script>
     <script type="text/javascript" src="js/jira.plugin.js"></script>
     <script type="text/javascript" src="js/roadmap.js"></script>
 
@@ -26,11 +27,11 @@
     <!-- Required in order to make accordion work -->
     <script type="text/javascript" src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="https://www.nuxeo.com/wp-content/themes/nuxeo.com_wp/js/xnav_get.js" charset="utf-8"></script>
-    <script type="text/javascript">
+    <!--<script type="text/javascript">
       window.analytics||(window.analytics=[]),window.analytics.methods=["identify","track","trackLink","trackForm","trackClick","trackSubmit","page","pageview","ab","alias","ready","group","on","once","off"],window.analytics.factory=function(t){return function(){var a=Array.prototype.slice.call(arguments);return a.unshift(t),window.analytics.push(a),window.analytics}};for(var i=0;i<window.analytics.methods.length;i++){var method=window.analytics.methods[i];window.analytics[method]=window.analytics.factory(method)}window.analytics.load=function(t){var a=document.createElement("script");a.type="text/javascript",a.async=!0,a.src=("https:"===document.location.protocol?"https://":"http://")+"d2dq2ahtl5zl1z.cloudfront.net/analytics.js/v1/"+t+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(a,n)},window.analytics.SNIPPET_VERSION="2.0.8",
       window.analytics.load("4qquvje3fv");
       window.analytics.page("Nuxeo Roadmap");
-    </script>
+    </script>-->
   </head>
   <body data-spy="scroll" data-target="#myScrollspy" ng-app="nxroadmap">
     <div class="row">
@@ -68,17 +69,18 @@
       </div>
       <div class="col-md-9" id="issues" ng-controller="issues">
         <div class="row" ng-controller="components" style="margin-bottom: 28px">
-          <select class="col-md-12" multiple="multiple" id="components">
+          <select style="width: 100%" multiple="multiple" id="components">
             <option value="{{cmp.id}}" ng-repeat="cmp in components">{{cmp.name}}</option>
           </select>
         </div>
         <div class="row">
           <div class="panel-group">
+            <div id="issues-loader" style="width: 100%; background-color: rgb(140,140,140); display: none;"></div>
             <div class="panel panel-default" ng-repeat="issue in issues">
               <div class="panel-heading">
                 <h4 class="panel-title">
                   {{issue.fields.summary}}
-                  <div class="btn-group pull-right">                                 
+                  <div class="btn-group pull-right">
                     <a ng-if="issue.fields.customfield_10902" target="_blank" title="Link to sources" href="{{issue.fields.customfield_10902}}"><span class="glyphicon glyphicon-eye-open"></span></a>
                     <a ng-if="issue.fields.customfield_10903" target="_blank" title="Link to a video" href="{{issue.fields.customfield_10903}}"><span class="glyphicon glyphicon-film"></span></a>
                     <a ng-if="issue.fields.customfield_10899" target="_blank" title="Link to the developper documentation" href="{{issue.fields.customfield_10899}}"><span class="glyphicon glyphicon-book"></span></a>
