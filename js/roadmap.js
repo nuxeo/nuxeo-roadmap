@@ -190,8 +190,8 @@
 			if(clear === true) {
 				$('#versions .active').removeClass('active');
 
-				// If we're here we're sure that the method call is doing by the user click.
-				// At this pooint we have to check if the selected lts isn't already displayed.
+				// If we're here we're sure that the method call is triggered by the user click.
+				// At this point we have to check if the selected lts isn't already displayed.
 				if(ltsId === roadmap.getVersionSelection().id) {
 					console.debug('LTS ' + ltsId + ' already displayed');
 					return;
