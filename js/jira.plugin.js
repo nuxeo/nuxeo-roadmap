@@ -157,7 +157,7 @@
         this.ids 		 = [];
         // All lts
         this.lts         = [];
-        // LTS map where the key is an LTS id and the values an array of FT
+        // LTS map where the key is a LTS id and the values an array of FT
         this.versions    = {};
         // Same as versions but just with the ids
         this.versionsIds = {};
@@ -240,8 +240,18 @@
 					versions = [options.version];
 				}
 
-				var url = new Search(options.url)
-							.project(options.project)
+				var project = options.project;
+				if(! options.project) {
+					throw new Error('The project name must be specified');
+				}
+
+				var url = options.url;
+				if(! options.url) {
+					throw new Error('The project url must be specified');
+				}
+
+				var url = new Search(url)
+							.project(project)
 							.and()
 							.isIn('fixversion', versions)
 							.expand('renderedFields')

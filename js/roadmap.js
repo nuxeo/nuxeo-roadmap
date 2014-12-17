@@ -20,8 +20,10 @@
 	var ISSUE_LOADER_SELECTOR = '#issues-loader';
 	var JIRA_BASE_URL         = 'https://jira.nuxeo.com';
 	var JIRA_PROJECT 		  = 'NXROADMAP';
+
 	// Issues (all) cache
 	var CACHE 		= [];
+
 	// Event constants
 	var NXEVENT = {
 		VERSION_CLICK 				: 'version.click',
@@ -40,13 +42,13 @@
 			getVersions: function(callback) {
 				return $.jira('versions', {
 					'project': JIRA_PROJECT,
-					'url': JIRA_BASE_URL
+					'url'    : JIRA_BASE_URL
 				}).done(callback);
 			},
 			getComponents: function(callback) {
 				return $.jira('components', {
 					'project': JIRA_PROJECT,
-					'url': JIRA_BASE_URL
+					'url'    : JIRA_BASE_URL
 				}).done(callback);
 			},
 			getIssues: function(versions, callback) {
@@ -87,7 +89,6 @@
 			},
 			getComponentsSelection: function() {
 				return lookup('#components').chosen().val();
-//				return $('#components').chosen().val();
 			},
 			// Get global selection object
 			getSelection: function() {
