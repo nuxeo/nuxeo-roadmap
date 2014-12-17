@@ -18,6 +18,8 @@
 	}();
 
 	var ISSUE_LOADER_SELECTOR = '#issues-loader';
+	var JIRA_BASE_URL         = 'https://jira.nuxeo.com';
+	var JIRA_PROJECT 		  = 'NXROADMAP';
 	// Issues (all) cache
 	var CACHE 		= [];
 	// Event constants
@@ -37,27 +39,27 @@
 		return {
 			getVersions: function(callback) {
 				return $.jira('versions', {
-					'project': 'NXROADMAP',
-					'url': 'https://jira.nuxeo.com'
+					'project': JIRA_PROJECT,
+					'url': JIRA_BASE_URL
 				}).done(callback);
 			},
 			getComponents: function(callback) {
 				return $.jira('components', {
-					'project': 'NXROADMAP',
-					'url': 'https://jira.nuxeo.com'
+					'project': JIRA_PROJECT,
+					'url': JIRA_BASE_URL
 				}).done(callback);
 			},
 			getIssues: function(versions, callback) {
 				return $.jira('issues', {
-					'project'	: 'NXROADMAP',
-					'url'		: 'https://jira.nuxeo.com',
+					'project'	: JIRA_PROJECT,
+					'url'		: JIRA_BASE_URL,
 					'version'	: versions
 				}).done(callback);
 			},
 			getDeferredIssues: function(versions) {
 				return $.jira('issues', {
-					'project'	: 'NXROADMAP',
-					'url'		: 'https://jira.nuxeo.com',
+					'project'	: JIRA_PROJECT,
+					'url'		: JIRA_BASE_URL,
 					'version'	: versions
 				});
 			}
