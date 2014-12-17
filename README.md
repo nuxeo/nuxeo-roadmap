@@ -3,6 +3,8 @@ nuxeo-roadmap
 
 Javascript single page visualizer for the Nuxeo roadmap, that queries Jira for displaying the content.
 
+The website is available at : http://roadmap.nuxeo.com
+
 Local install (without apache)
 =
 
@@ -17,8 +19,8 @@ The following instructions works for any os if you have the followed programs in
 3.Start a web server
 > python -m SimpleHTTPServer
 
-4.Install a CORS extension for your browser in order to allow the roadmap to consume the jira rest api.
-> For chrome: https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi?utm_source=chrome-ntp-icon
+4.Cross origin must be forced or disabled in order to allow the roadmap to consume the jira rest api
+> In chrome, you can use this plugin: https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi
 
 5.Go to the roadmap url
 > This should be: http://localhost:8000
@@ -34,8 +36,8 @@ The following instructions works for any os if you have the followed programs in
 
 2.Make sure that apache is started
 
-3.Install a CORS extension for your browser in order to allow the roadmap to consume the jira rest api.
-> Chrome: https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi?utm_source=chrome-ntp-icon
+3.Cross origin must be forced or disabled in order to allow the roadmap to consume the jira rest api
+> Chrome: https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi
 
 4.Go to the roadmap url
 > This should be: http://localhost/nuxeo-roadmap
