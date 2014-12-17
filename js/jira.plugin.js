@@ -247,7 +247,7 @@
 							.expand('renderedFields')
 							.toURL();
 
-				return $.when($.get(url));
+				return $.get(url);
 			},
 			components: function(options) {
 				var url = options.url + '/rest/api/latest/project/' + options.project + '/components';

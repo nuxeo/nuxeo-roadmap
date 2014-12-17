@@ -53,6 +53,13 @@
 					'url'		: 'https://jira.nuxeo.com',
 					'version'	: versions
 				}).done(callback);
+			},
+			getDeferredIssues: function(versions) {
+				return $.jira('issues', {
+					'project'	: 'NXROADMAP',
+					'url'		: 'https://jira.nuxeo.com',
+					'version'	: versions
+				});
 			}
 		};
 	}])
@@ -119,6 +126,7 @@
 			// Versions to filter
 			var versionsIds = [];
 			if(selection.version) {
+				// TODO: Add the lts id to the versionsIds only if the current selection is a lts
 				var versionsIds = selection.version.lts ? versions.versionsIds[selection.version.id] : [selection.version.id];
 			}
 
@@ -174,6 +182,12 @@
 	// Base controller
 	.controller('root', function($scope, $sce, roadmap) {
 		$scope.filterIssuesByVersion = function(versionId) {
+			// Short circuit the broadcasts if the clicked version is already selected
+			if(versionId === roadmap.getVersionSelection().id) {
+				console.log('Version is already selected');
+				return;
+			}
+
 			$scope.$broadcast(NXEVENT.VERSION_CLICK, versionId);
 			$scope.$broadcast(NXEVENT.FILTER_BY_SELECTION);
 		};
@@ -258,22 +272,49 @@
 
 		$scope.$on(NXEVENT.VERSIONS_LOADED, function(event, versions) {
 			$scope.versions = versions;
-			jira.getIssues(versions.ids, function(data, status) {
+
+			var callbacks = [];
+			// Prepare an array of deferred which old issues querying for one LTS and it's associated FTs
+			for(var vId in versions.versionsIds) {
+				var ids = versions.versionsIds[vId];
+				ids.push(vId);
+
+				callbacks.push(jira.getDeferredIssues(ids));
+			}
+
+			// Use the jquery promise api to chain issues call and invoke our callback once requests are done
+			$.when.apply($, callbacks).done(function() {
+				// Will hold the results (issues) of each http call to jira
+				var collectedIssues = [];
+
+				// Collect the LTS call response data in one array (collectedIssues)
+				for(var i in arguments) {
+					var params = arguments[i];
+					if(params[1] !== 'success') {
+						throw new Error('The request for the jira issues request respond with status ' + params[2].statusText);
+					}
+
+					// Merge the current issues data with the old one
+					collectedIssues = $.merge(params[0].issues, collectedIssues);
+				}
+
+				// Hide the issues loader
+				lookup(ISSUE_LOADER_SELECTOR, true).nxloader('hide', {
+					callback: function(elm) {
+						elm.remove();
+					}
+				});
+
 				$scope.$apply(function() {
-					// Filter issues by priority
-					var filtereds = $filter('priority')(data.issues);
-					// Hide the issues loader (and remove this elm from the selector registry)
-					lookup(ISSUE_LOADER_SELECTOR, true).nxloader('hide', {
-						callback: function(elm) {
-							elm.remove();
-						}
-					});
-					// Cache filtereds issues and bind them on the scope
-					$scope.issues = CACHE = filtereds;
+					// Filter issues by priority, cache them and update scope
+					$scope.issues = CACHE = $filter('priority')(collectedIssues);
+
+					// Open the panel which hold the current LTS and retrieve this version id
 					var ltsId = $('.panel-info div[role=tabpanel]')
 									.addClass('in')
 									.parent('.panel')
 									.attr('data-version');
+					// Fire event which will take care of LTS filtering based on the current LTS
 					$scope.filterIssuesByLts(ltsId);
 				});
 			});
