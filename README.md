@@ -20,4 +20,4 @@ Local install
 > For chrome: https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi?utm_source=chrome-ntp-icon
 
 5.Go to the roadmap url
-> The url should be (if you follow the instruction number three): localhost:8000
+> The url should be (if you have followed the instruction number three): localhost:8000
