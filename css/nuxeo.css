@@ -8,7 +8,7 @@ body, h1 {
 }
 
 h1 {
-  font-weight: 600;
+  font-weight: 400;
   margin-left:-3px;
   margin-bottom: 0;
   font-size: 42px;
@@ -19,14 +19,6 @@ h2 {
   margin-bottom: 20px;
 }  
   
-.well {
-  box-shadow: none;
-  border: none;
-  display: inline-block;
-  padding:10px 15px;
-  float:right;
-  border-left: 1px solid #DDDDDD;
-}
 
 .well h3 {
   margin-top:0;
@@ -52,6 +44,7 @@ h2 {
   margin-bottom: 3px;
   font-size: 14px;
   width: 120px;
+  font-weight: 400;
 }
   
 .nav > li > a {
@@ -113,7 +106,7 @@ h2 {
 }
 
 .jumbotron .col-lg-3 {
-  width: auto;
+/*  width: auto; */
 }
 
 .alert {
@@ -125,7 +118,9 @@ h2 {
 }
 
 .alert-warning, .label-warning {
-  background-color: #FFBA0D;
+  background-color: #fff;
+  border:2px solid #404d9e;
+  color:#404d9e;
 }
 /*
 .alert-success, .label-success {
@@ -192,12 +187,6 @@ h2 {
 
 }
 
-#issues .badge {
-  background-color: #FAE6E6; 
-  color: rgb(45, 45, 45);
-  border: 1px solid #EBB0B0;
-  letter-spacing: 0px;
-}
 
 #issues .badge:hover {
   cursor: pointer;
@@ -205,4 +194,61 @@ h2 {
 
 .chosen-container-multi .chosen-choices li.search-field input[type=text] {
   height: 25px;
+}
+
+/* Nuxeo colors override - december 2014 */
+
+.well {
+  margin-top:21px;
+}
+
+.panel-info>.panel-heading {
+  color: white;
+  background-color: #00adff;
+  border-color: #00adff;
+}
+
+.panel-success>.panel-heading {
+  color: white;
+  background-color: #3da664;
+  border-color: #3da664;
+}
+
+.panel-body.list-group {
+  padding:0;
+}
+
+a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.active:focus {
+  background-color: rgba(181,227,247,0.5);
+  border-color: #b5e3f7;
+  color:#333;
+}
+
+#placeholder .panel-body .badge {
+  font-size:70%;
+}
+
+.panel-default>.panel-heading {
+  background-color: rgba(181,227,247,0.5);
+  border-color: #b5e3f7;
+}
+
+.panel-default {
+  border-color: #b5e3f7;
+}
+
+#issues .badge {
+  background-color: #0075b0; 
+  color: #fff;
+  border: 1px solid #0075b0;
+  letter-spacing: 0px;
+  line-height: 18px;
+  padding: 0 10px;
+  vertical-align: top;
+  margin-top: -2px;
+}
+
+.well h4 {
+  margin-top:0;
+  font-size: 15px;
 }

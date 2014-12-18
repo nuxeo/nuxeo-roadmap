@@ -8,7 +8,7 @@
     <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.min.css">
 
     <!-- Custom nuxeo -->
-    <link rel="stylesheet" type="text/css" href="css/nuxeo.min.css">
+    <link rel="stylesheet" type="text/css" href="css/nuxeo.css">
     
     <!-- jQuery library + plugins -->
     <script type="text/javascript" src="//code.jquery.com/jquery-1.10.2.min.js"></script>
@@ -37,18 +37,27 @@
   </head>
   <body data-spy="scroll" data-target="#myScrollspy" ng-app="nxroadmap">
     <div class="row">
+    
       <div class="jumbotron">
-        <div class="col-md-11">
+        <div class="col-md-9">
           <h1>Nuxeo Platform Roadmap</h1>
-          <h2>Monitor the evolution of the platform!</h2>
+          <h2>Monitor the evolution of the platform! <button type="button" class="btn btn-default btn-xs">What is this about</button>
+</h2>
         </div>
-      </div>
-      <div class="well col-md-1">
+      
+      <div class="well col-md-3">
+        <h4>Legend</h4>
         <span class="label label-success">Released</span>                
         <span class="label label-info">Current iteration</span>
-        <span class="label label-warning">Future iteration</span>        
+        <span class="label label-warning">Future iteration</span>   
+     
     </div>
+    </div>
+    
+    </div>
+    
     <div class="row" id="placeholder" ng-controller="root">
+    
       <div class="col-md-3" id="versions" ng-controller="versions">
         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="false">
           <div class="panel panel-{{version.panel}}" ng-repeat="version in versions.lts | orderBy: 'jsDate' :true" data-version="{{version.id}}">
@@ -69,8 +78,9 @@
             </div>
         </div>
       </div>
+      
       <div class="col-md-9" id="issues" ng-controller="issues">
-        <div class="row" ng-controller="components" style="margin-bottom: 28px">
+        <div class="row" ng-controller="components" style="margin-bottom: 28px;margin-top: 6px;">
           <select style="width: 100%" multiple="multiple" id="components">
             <option value="{{cmp.id}}" ng-repeat="cmp in components">{{cmp.name}}</option>
           </select>
