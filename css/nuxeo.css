@@ -160,6 +160,10 @@ h2 {
   height: 64px;
 }
 
+.issue-resolved .panel-title {
+  text-decoration: line-through;
+}
+
 
 /* Override bootstrap css */
 

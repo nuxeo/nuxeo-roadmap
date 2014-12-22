@@ -37,6 +37,14 @@
 	Search.prototype.expand = function(value) {
 		return this.filter('expand', value);
 	};
+	Search.prototype.fields = function(value) {
+		if(! value) {
+			return this;
+		}
+
+		var fields = $.isArray(value) ? value : [value];
+		return this.filter('fields', fields.join(','));
+	};
 	Search.prototype.condition = function(property, operator, value, suffix) {
 		this.conditions.push(
 			(property || '') +
@@ -194,8 +202,11 @@
                     versionsIds.push(subVersion.id);
                 };
 
-                // to inverse: versions.reverse()
-                self.versions[version.id] = versions;
+                /* 
+                 * order desc: versions
+                 * order asc : versions.reverse()
+                 */
+                self.versions[version.id] 	 = versions.reverse();
                 self.versionsIds[version.id] = versionsIds;
 
                 // Check active version id lts - and if found set the lts panel type to info because it contains the active FT
@@ -224,10 +235,6 @@
     // End Versions
 
 
-	// Make it public for debugging
-	//window.Search = Search;
-
-
 	var functions = {
 		exposed: {
 			versions: function(options) {
@@ -250,11 +257,17 @@
 					throw new Error('The project url must be specified');
 				}
 
+				var fields = false;
+				if($.isArray(options.fields)) {
+					fields = options.fields;
+				}
+
 				var url = new Search(url)
 							.project(project)
 							.and()
 							.isIn('fixversion', versions)
 							.expand('renderedFields')
+							.fields(fields)
 							.toURL();
 
 				return $.get(url);

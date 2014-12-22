@@ -27,37 +27,31 @@
     <!-- Required in order to make accordion work -->
     <script type="text/javascript" src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="https://www.nuxeo.com/wp-content/themes/nuxeo.com_wp/js/xnav_get.js" charset="utf-8"></script>
-    <script type="text/javascript">
+    <!--<script type="text/javascript">
       window.analytics||(window.analytics=[]),window.analytics.methods=["identify","track","trackLink","trackForm","trackClick","trackSubmit","page","pageview","ab","alias","ready","group","on","once","off"],window.analytics.factory=function(t){return function(){var a=Array.prototype.slice.call(arguments);return a.unshift(t),window.analytics.push(a),window.analytics}};for(var i=0;i<window.analytics.methods.length;i++){var method=window.analytics.methods[i];window.analytics[method]=window.analytics.factory(method)}window.analytics.load=function(t){var a=document.createElement("script");a.type="text/javascript",a.async=!0,a.src=("https:"===document.location.protocol?"https://":"http://")+"d2dq2ahtl5zl1z.cloudfront.net/analytics.js/v1/"+t+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(a,n)},window.analytics.SNIPPET_VERSION="2.0.8",
       window.analytics.load("4qquvje3fv");
       window.analytics.page("Nuxeo Roadmap");
-    </script>
+    </script>-->
 
-     <meta charset="UTF-8"> 
+     <meta charset="UTF-8">
   </head>
   <body data-spy="scroll" data-target="#myScrollspy" ng-app="nxroadmap">
     <div class="row">
-    
       <div class="jumbotron">
         <div class="col-md-9">
           <h1>Nuxeo Platform Roadmap</h1>
-          <h2>Monitor the evolution of the platform! <button type="button" class="btn btn-default btn-xs">What is this about</button>
-</h2>
+          <h2>Monitor the evolution of the platform! <button id="about" type="button" data-toggle="modal" data-target="#about-modal" class="btn btn-default btn-xs">What is this about</button></h2>
         </div>
-      
-      <div class="well col-md-3">
-        <h4>Legend</h4>
-        <span class="label label-success">Released</span>                
-        <span class="label label-info">Current iteration</span>
-        <span class="label label-warning">Future iteration</span>   
-     
-    </div>
-    </div>
-    
+        <div class="well col-md-3">
+          <h4>Legend</h4>
+          <span class="label label-success">Released</span>                
+          <span class="label label-info">Current iteration</span>
+          <span class="label label-warning">Future iteration</span>
+        </div>
+      </div>
     </div>
     
     <div class="row" id="placeholder" ng-controller="root">
-    
       <div class="col-md-3" id="versions" ng-controller="versions">
         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="false">
           <div class="panel panel-{{version.panel}}" ng-repeat="version in versions.lts | orderBy: 'jsDate' :true" data-version="{{version.id}}">
@@ -78,7 +72,7 @@
             </div>
         </div>
       </div>
-      
+
       <div class="col-md-9" id="issues" ng-controller="issues">
         <div class="row" ng-controller="components" style="margin-bottom: 28px;margin-top: 6px;">
           <select style="width: 100%" multiple="multiple" id="components">
@@ -88,7 +82,7 @@
         <div class="row">
           <div class="panel-group">
             <div id="issues-loader" style="width: 100%; background-color: rgb(140,140,140); display: none;"></div>
-            <div class="panel panel-default" ng-repeat="issue in issues">
+            <div class="panel panel-default {{isResolved(issue) ? 'issue-resolved' : ''}}" ng-repeat="issue in issues">
               <div class="panel-heading">
                 <h4 class="panel-title">
                   {{issue.fields.summary}}
@@ -100,7 +94,6 @@
                     <a ng-if="issue.fields.customfield_10901" target="_blank" title="Link to the install/setup documentation" href="{{issue.fields.customfield_10901}}"><span class="glyphicon glyphicon-book"></span></a>
                     <a ng-if="issue.fields.customfield_10904" target="_blank" title="Link to a related blogpost" href="{{issue.fields.customfield_10904}}"><span class="glyphicon glyphicon-align-left"></span></a>
                     <a target="_blank" title="View/Edit on JIRA" href="http://jira.nuxeo.com/browse/{{issue.key}}"><span class="glyphicon glyphicon-edit"></span></a>
-
                     <span ng-repeat="fixVersion in issue.fields.fixVersions" ng-click="filterIssuesByVersion(fixVersion.id, true)" class="badge glyphicon">{{fixVersion.name}}</span>
                   </div>
                 </h4>
@@ -111,4 +104,22 @@
         </div>
       </div>
     </div>
+
+    <!-- About modal -->
+    <div class="modal fade" id="about-modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">
+              <span aria-hidden="true">&times;</span>
+              <span class="sr-only">Close</span>
+            </button>
+            <h4 class="modal-title">About</h4>
+          </div>
+          <div class="modal-body" ng-include="'/about.html'"><!-- see about.html --></div>
+        </div>
+      </div>
+    </div>
+
+  </body>
 </html>

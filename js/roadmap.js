@@ -62,7 +62,12 @@
 				return $.jira('issues', {
 					'project'	: JIRA_PROJECT,
 					'url'		: JIRA_BASE_URL,
-					'version'	: versions
+					'version'	: versions,
+					'fields'	: [
+						'fixVersions', 'components', 'priority', 'description', 'summary', 'status',
+						'customfield_10902', 'customfield_10903', 'customfield_10899',
+						'customfield_10900', 'customfield_10901', 'customfield_10904'
+					]
 				});
 			}
 		};
@@ -272,6 +277,10 @@
 			// Apply the active class on the selected ft
 			$('a[data-version=' + versionId + ']').addClass('active');
 		});
+
+		$scope.isResolved = function(issue) {
+			return issue.fields.status.name === 'Resolved';
+		};
 
 		$scope.$on(NXEVENT.VERSIONS_LOADED, function(event, versions) {
 			$scope.versions = versions;
