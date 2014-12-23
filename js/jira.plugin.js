@@ -281,6 +281,28 @@
 			},
 			search: function(baseURL) {
 				return new Search(baseURL);
+			},
+			attachments: function(options) {
+				// Issue id
+				var issue = options.issue;
+				if(! issue) {
+					throw new Error('You must provide the issue id under the key \'issue\'');
+				}
+
+				// Zip plugin options
+				var extractOpts = options.extract;
+				if(! extractOpts) {
+					throw new Error('You must provide extract options under the key \'extract\'. This object will be passed to the nxzip plugin');
+				}
+
+				// The url to call
+				var url = options.url + '/secure/attachmentzip/' + issue + '.zip';
+				// Final opts (with the url of the zip to download)
+				var finalExtractOpts = $.extend({}, extractOpts, {
+					'url': url
+				});
+				// Start the archive download and extraction
+				$.nxzip('extract', finalExtractOpts);
 			}
 		}
 	};

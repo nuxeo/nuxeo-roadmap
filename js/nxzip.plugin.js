@@ -41,13 +41,15 @@
                 // Fetch the archive
                 JSZipUtils.getBinaryContent(url, function(err, data) {
                     if(err) {
+                        console.log('Error when downloading the zip');
+                        console.debug(arguments);
                         throw err;
                     }
 
                     // Create a new jszip instance in order to read the archive
                     var zip     = new JSZip(data);
                     // The final files which will be passed to the callback
-                    var files   = [];
+                    var files   = {};
                     // A filter that can reduce the files that will be passed to the callback
                     var filter  = options.filter;
                     // A filter in any object that has a 'test' method
@@ -58,7 +60,7 @@
                             var file = zip.files[i];
                             // Check if the file pass the filter
                             if(filter.test(file.name)) {
-                                files.push(file);
+                                files[file.name] = file;
                             }
                         }
                     }
@@ -73,7 +75,7 @@
                 });
             },
             // Simple alias to the functions.exposed.uncompress method
-            extract : function() {
+            extract: function() {
                 return functions.exposed.uncompress.apply(this, arguments);
             }
         }

@@ -20,6 +20,7 @@
 	var ISSUE_LOADER_SELECTOR = '#issues-loader';
 	var JIRA_BASE_URL         = 'https://jira.nuxeo.com';
 	var JIRA_PROJECT 		  = 'NXROADMAP';
+	var IMG_FILTER 			  =  /\.(png|jpeg|jpg|gif|pdf)$/i;
 
 	// Issues (all) cache
 	var CACHE 		= [];
@@ -61,6 +62,16 @@
 						'customfield_10902', 'customfield_10903', 'customfield_10899',
 						'customfield_10900', 'customfield_10901', 'customfield_10904'
 					]
+				});
+			},
+			getAttachments: function(issueId, callback, filter) {
+				$.jira('attachments', {
+					'url': JIRA_BASE_URL,
+					'issue': issueId,
+					'extract': {
+						'callback': callback,
+						'filter': filter
+					}
 				});
 			}
 		};
