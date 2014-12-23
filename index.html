@@ -44,7 +44,7 @@
         </div>
         <div class="well col-md-3">
           <h4>Legend</h4>
-          <span class="label label-success">Released</span>                
+          <span class="label label-success">Released</span>
           <span class="label label-info">Current iteration</span>
           <span class="label label-warning">Future iteration</span>
         </div>
@@ -57,7 +57,7 @@
           <div class="panel panel-{{version.panel}}" ng-repeat="version in versions.lts | orderBy: 'jsDate' :true" data-version="{{version.id}}">
               <div class="panel-heading" role="tab" id="heading-{{version.id}}">
                 <h4 class="panel-title">
-                  <a ng-click="filterIssuesByLts(version.id, true)" data-toggle="collapse" data-parent="#accordion" href="#collapse-{{version.id}}" aria-expanded="true">
+                  <a ng-click="filterIssuesByLts(version.id, true)" data-toggle="collapse" data-parent="#accordion" href="" data-target="#collapse-{{version.id}}" aria-expanded="true">
                     {{version.name}} <span class="badge">{{version.jsDate | date: 'longDate' }}</span>
                   </a>
                 </h4>

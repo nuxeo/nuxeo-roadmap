@@ -51,14 +51,7 @@
 					'url'    : JIRA_BASE_URL
 				}).done(callback);
 			},
-			getIssues: function(versions, callback) {
-				return $.jira('issues', {
-					'project'	: JIRA_PROJECT,
-					'url'		: JIRA_BASE_URL,
-					'version'	: versions
-				}).done(callback);
-			},
-			getDeferredIssues: function(versions) {
+			getIssues: function(versions) {
 				return $.jira('issues', {
 					'project'	: JIRA_PROJECT,
 					'url'		: JIRA_BASE_URL,
@@ -273,9 +266,9 @@
 	.controller('issues', function($scope, $filter, $timeout, roadmap, jira) {
 		$scope.$on(NXEVENT.VERSION_CLICK, function(event, versionId) {
 			// Remove the class active on the previously selected ft
-			$('a[data-version]').removeClass('active');
+			lookup('a[data-version]').removeClass('active');
 			// Apply the active class on the selected ft
-			$('a[data-version=' + versionId + ']').addClass('active');
+			lookup('a[data-version=' + versionId + ']').addClass('active');
 		});
 
 		$scope.isResolved = function(issue) {
@@ -291,7 +284,7 @@
 				var ids = versions.versionsIds[vId];
 				ids.push(vId);
 
-				callbacks.push(jira.getDeferredIssues(ids));
+				callbacks.push(jira.getIssues(ids));
 			}
 
 			// Use the jquery promise api to chain issues call and invoke our callback once requests are done
