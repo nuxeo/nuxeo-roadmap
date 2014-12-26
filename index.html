@@ -100,7 +100,7 @@
                 </h4>
               </div>
               <div class="panel-body" ng-bind-html="trusted(issue.renderedFields.description)"></div>
-              <div class="panel-footer" issue-attachments>
+              <div class="panel-footer" issue-attachments ng-show="issue.attachments.length > 0">
                 <a
                   title="{{attachment.name}}"
                   href="{{attachment.url}}" ng-class="attachment.image ? 'img-issue-' + issue.id : ''"
