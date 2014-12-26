@@ -30,14 +30,17 @@
 	};
 
 	// Get the content from a filename by extraxcting the extension
-	function contentTypeOf(filename) {
+	function contentTypeOf(ext) {
+		return CONTENT_TYPES[ext];
+	}
+
+	function extensionOf(filename) {
 		var idx = filename.lastIndexOf('.');
 		if(idx <= 0) {
 			return false;
 		}
 
-		var ext = filename.substr(idx + 1);
-		return CONTENT_TYPES[ext];
+		return filename.substr(idx + 1);
 	}
 
 	var ISSUE_LOADER_SELECTOR = '#issues-loader';
@@ -63,8 +66,8 @@
 	};
 
 	// Thumbs for content types (see ATTACHMENTS_FILTER)
-	var CONTENT_TYPES_THUMBS = {
-		'application/pdf': '/img/contenttypes/pdf.png'
+	var EXTENSIONS_THUMBS = {
+		'pdf': '/img/contenttypes/pdf.png'
 	};
 
 
@@ -103,13 +106,14 @@
 				var attachments = [];
 				for(var name in files) {
 					var file 		= files[name];
-					var contentType = contentTypeOf(name);
+					var extension   = extensionOf(name);
+					var contentType = contentTypeOf(extension);
 					var blob    	= new Blob([file._data.getContent()], {
 						'type': contentType
 					});
 
 					var blobUrl = URL.createObjectURL(blob);
-					var thumb   = roadmap.getContentTypeThumb(contentType);
+					var thumb   = roadmap.getExtensionThumb(extension);
 					if(! thumb) {
 						thumb = blobUrl;
 					}
@@ -177,8 +181,8 @@
 
 	.factory('roadmap', [function() {
 		return {
-			getContentTypeThumb: function(contentType) {
-				return CONTENT_TYPES_THUMBS[contentType];
+			getExtensionThumb: function(contentType) {
+				return EXTENSIONS_THUMBS[contentType];
 			},
 			// Return an LTS id if no ft is selected else return the selected ft id
 			getVersionSelection: function() {
