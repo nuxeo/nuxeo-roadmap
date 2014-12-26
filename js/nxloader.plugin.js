@@ -18,7 +18,7 @@
 				options.callback(self);
 			}
 		} else if(action === 'hide') {
-			self.hide().html('');
+			self.html('');
 
 			if(typeof options.callback === 'function') {
 				options.callback(self);

@@ -17,27 +17,125 @@
 		};
 	}();
 
+	var CONTENT_TYPES = {
+		'png' : 'image/png',
+		'jpg' : 'image/jpeg',
+		'jpeg': 'image/jpeg',
+		'gif' : 'image/gif',
+		'svg' : 'image/svg+xml',
+		'pdf' : 'application/pdf',
+		'xml' : 'application/xml',
+		'json': 'application/json',
+		'zip' : 'application/zip'
+	};
+
+	// Get the content from a filename by extraxcting the extension
+	function contentTypeOf(filename) {
+		var idx = filename.lastIndexOf('.');
+		if(idx <= 0) {
+			return false;
+		}
+
+		var ext = filename.substr(idx + 1);
+		return CONTENT_TYPES[ext];
+	}
+
 	var ISSUE_LOADER_SELECTOR = '#issues-loader';
 	var JIRA_BASE_URL         = 'https://jira.nuxeo.com';
 	var JIRA_PROJECT 		  = 'NXROADMAP';
-	var IMG_FILTER 			  =  /\.(png|jpeg|jpg|gif|pdf)$/i;
+	/*
+	 * File that are conserved for rendering (preview in the issue footer).
+	 * 
+	 * Files that are not images should also be added in CONTENT_TYPES_THUMBS object
+	 * with their associated thumb. In addition to this, you must also check if the file extension is in CONTENT_TYPES.
+	 */
+	var ATTACHMENTS_FILTER	  = /\.(png|jpeg|jpg|gif|pdf)$/i;
 
 	// Issues (all) cache
 	var CACHE 		= [];
 
 	// Event constants
 	var NXEVENT = {
-		VERSION_CLICK 				: 'version.click',
-		VERSIONS_LOADED				: 'versions.loaded',
-		COMPONENTS_LOADED 			: 'components.loaded',
-		FILTER_BY_SELECTION			: 'filter.selection'
+		VERSION_CLICK 		: 'version.click',
+		VERSIONS_LOADED		: 'versions.loaded',
+		COMPONENTS_LOADED 	: 'components.loaded',
+		FILTER_BY_SELECTION	: 'filter.selection'
+	};
+
+	// Thumbs for content types (see ATTACHMENTS_FILTER)
+	var CONTENT_TYPES_THUMBS = {
+		'application/pdf': '/img/contenttypes/pdf.png'
 	};
 
 
 	// Roadmap module
 	angular.module('nxroadmap', [])
 
-	// jira service
+	// Required in order to remove the 'unsafe' prefix added in links hrefs
+	.config(['$compileProvider', function($compileProvider) {
+  		$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|file|blob):/);
+	}])
+
+	// This directive automatically add an 'attachments' property on the available issue for the current scope
+	.directive('issueAttachments', function(jira, roadmap) {
+	  return {
+	    //template: '<span ng-repeat="f in issue.files">{{f}}</span>',
+	    compile: function(element, attributes) {
+	    	return {
+	            pre: function(scope, element, attributes, controller, transcludeFn) {
+	            	// Cache the element in order to use it in the controller function
+	            	scope.elm = element;
+	            },
+	            post: function(scope, element, attributes, controller, transcludeFn) {
+	            	//
+	            }
+	        };
+     	},
+	    controller: function($scope) {
+	    	// Check if we have already proceed the attachments for this issue
+	    	if($scope.issue.files !== undefined) {
+	    		console.log('files are already present');
+	    		return;
+	    	}
+
+	    	// Download attachments for the current issue
+			jira.getAttachments($scope.issue.id, function(files) {
+				var attachments = [];
+				for(var name in files) {
+					var file 		= files[name];
+					var contentType = contentTypeOf(name);
+					var blob    	= new Blob([file._data.getContent()], {
+						'type': contentType
+					});
+
+					var blobUrl = URL.createObjectURL(blob);
+					var thumb   = roadmap.getContentTypeThumb(contentType);
+					if(! thumb) {
+						thumb = blobUrl;
+					}
+
+					attachments.push({
+						// The file blob url
+						'url'  : blobUrl,
+						// The thumb image that is visible on an issue footer
+						'thumb': thumb,
+						// Currently the file is an image if the two url are the same (images can be used for preview but not the other types like pdf so we use a specific image to preview the file)
+						'image': (blobUrl === thumb),
+						// The name of the file
+						'name' : name
+					});
+				}
+
+				$scope.$evalAsync(function() {
+					// Cache the attachments with the issue
+					$scope.issue.attachments = attachments;
+				});
+			}, ATTACHMENTS_FILTER);
+	    }
+	  };
+	})
+
+	// Wrap jira plugin call
 	.factory('jira', [function() {
 		return {
 			getVersions: function(callback) {
@@ -79,6 +177,9 @@
 
 	.factory('roadmap', [function() {
 		return {
+			getContentTypeThumb: function(contentType) {
+				return CONTENT_TYPES_THUMBS[contentType];
+			},
 			// Return an LTS id if no ft is selected else return the selected ft id
 			getVersionSelection: function() {
 				var selection = {
@@ -109,6 +210,7 @@
 		};
 	}])
 
+	// Ordered the passed issues by priority
 	.filter('priority', function() {
 		return function(issues) {
 			if(! issues) {
@@ -286,6 +388,14 @@
 			return issue.fields.status.name === 'Resolved';
 		};
 
+		$scope.showImage = function($event, issueId) {
+			var elm = $($event.currentTarget);
+	        $('a.img-issue-' + issueId).colorbox({
+	        	'rel'  : 'img-issue-' + issueId,
+	        	'photo': true
+	        });
+		};
+
 		$scope.$on(NXEVENT.VERSIONS_LOADED, function(event, versions) {
 			$scope.versions = versions;
 
@@ -336,11 +446,12 @@
 			});
 		});
 
+		// Filter issues based on the current selection
 		$scope.$on(NXEVENT.FILTER_BY_SELECTION, function(event, versionSelection) {
 			var selection = null;
 
 			if(versionSelection) {
-				// Force to use the passed selection
+				// Force usage of the passed selection
 				selection = {
 					components 	: roadmap.getComponentsSelection(),
 					version 	: versionSelection
@@ -352,7 +463,7 @@
 			}
 
 			$timeout(function() {
-				// Reduce the displayed issues based on the computed selection
+				// Reduce the displayed issues based on a selection
 				$scope.issues = $filter('reduce')(CACHE, $scope.versions, selection);
 			});
 		});
