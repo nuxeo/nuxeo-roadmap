@@ -4,6 +4,7 @@ NETWORK:
 *
 
 CACHE:
+
 //code.jquery.com/jquery-1.10.2.min.js
 
 //netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js
@@ -17,13 +18,13 @@ CACHE:
 //netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css
 //netdna.bootstrapcdn.com/bootswatch/3.1.1/yeti/bootstrap.min.css
 
+js/nxloader.plugin.js
 
 lib/jszip.packaged.min.js
 
-css/nuxeo.min.css
+css/nuxeo.css
 
 img/loader.svg
-img/lts_.png
-img/ft_.png
+img/thumbs/pdf.png
 
 https://www.nuxeo.com/wp-content/themes/nuxeo.com_wp/js/xnav_get.js
