@@ -96,7 +96,7 @@
      	},
 	    controller: function($scope) {
 	    	// Check if we have already proceed the attachments for this issue
-	    	if($scope.issue.files !== undefined) {
+	    	if($scope.issue.attachments !== undefined) {
 	    		console.log('files are already present');
 	    		return;
 	    	}
@@ -395,8 +395,9 @@
 		$scope.showImage = function($event, issueId) {
 			var elm = $($event.currentTarget);
 	        $('a.img-issue-' + issueId).colorbox({
-	        	'rel'  : 'img-issue-' + issueId,
-	        	'photo': true
+	        	'rel'  		: 'img-issue-' + issueId,
+	        	'photo' 	: true,
+	        	'maxHeight'	: '92%'
 	        });
 		};
 
