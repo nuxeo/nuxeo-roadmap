@@ -17,17 +17,45 @@
 		};
 	}();
 
-	var CONTENT_TYPES = {
-		'png' : 'image/png',
-		'jpg' : 'image/jpeg',
-		'jpeg': 'image/jpeg',
-		'gif' : 'image/gif',
-		'svg' : 'image/svg+xml',
-		'pdf' : 'application/pdf',
-		'xml' : 'application/xml',
-		'json': 'application/json',
-		'zip' : 'application/zip'
-	};
+	function fileInfo(file, roadmap) {
+		var extension   = extensionOf(file.name);
+		var contentType = contentTypeOf(extension);
+		var blob    	= new Blob([file.asArrayBuffer()], {
+			'type': contentType
+		});
+
+		var blobUrl = URL.createObjectURL(blob);
+		var thumb   = roadmap.getExtensionThumb(extension);
+		if(! thumb) {
+			thumb = blobUrl;
+		}
+
+		return {
+			// The file blob url
+			'url'  : blobUrl,
+			// The thumb image that is visible on an issue footer
+			'thumb': thumb,
+			// Currently the file is an image if the two urls are the same (images can be used for preview but not the other types like pdf so we use a specific image to preview the file)
+			'image': (blobUrl === thumb),
+			// The name of the file
+			'name' : file.name
+		};
+	}
+
+	function processFiles(files, roadmap) {
+		var attachments = [];
+		for(var name in files) {
+			var file = files[name];
+			if(file.name !== undefined) {
+				attachments.push(fileInfo(file, roadmap));
+			}
+			else {
+				attachments = attachments.concat(processFiles(file, roadmap));
+			}
+		}
+
+		return attachments;
+	}
 
 	// Get the content from a filename by extraxcting the extension
 	function contentTypeOf(ext) {
@@ -43,9 +71,18 @@
 		return filename.substr(idx + 1);
 	}
 
-	var ISSUE_LOADER_SELECTOR = '#issues-loader';
-	var JIRA_BASE_URL         = 'https://jira.nuxeo.com';
-	var JIRA_PROJECT 		  = 'NXROADMAP';
+	var CONTENT_TYPES = {
+		'png' : 'image/png',
+		'jpg' : 'image/jpeg',
+		'jpeg': 'image/jpeg',
+		'gif' : 'image/gif',
+		'svg' : 'image/svg+xml',
+		'pdf' : 'application/pdf',
+		'xml' : 'application/xml',
+		'json': 'application/json',
+		'zip' : 'application/zip'
+	};
+
 	/*
 	 * File that are conserved for rendering (preview in the issue footer).
 	 * 
@@ -53,6 +90,15 @@
 	 * with their associated thumb. In addition to this, you must also check if the file extension is in CONTENT_TYPES.
 	 */
 	var ATTACHMENTS_FILTER	  = /\.(png|jpeg|jpg|gif|pdf)$/i;
+
+	// Thumbs for content types (see ATTACHMENTS_FILTER)
+	var EXTENSIONS_THUMBS = {
+		'pdf': '/img/thumbs/pdf.png'
+	};
+
+	var ISSUE_LOADER_SELECTOR = '#issues-loader';
+	var JIRA_BASE_URL         = 'https://jira.nuxeo.com';
+	var JIRA_PROJECT 		  = 'NXROADMAP';
 
 	// Issues (all) cache
 	var CACHE 		= [];
@@ -64,12 +110,6 @@
 		COMPONENTS_LOADED 	: 'components.loaded',
 		FILTER_BY_SELECTION	: 'filter.selection'
 	};
-
-	// Thumbs for content types (see ATTACHMENTS_FILTER)
-	var EXTENSIONS_THUMBS = {
-		'pdf': '/img/contenttypes/pdf.png'
-	};
-
 
 	// Roadmap module
 	angular.module('nxroadmap', [])
@@ -103,33 +143,8 @@
 
 	    	// Download attachments for the current issue
 			jira.getAttachments($scope.issue.id, function(files) {
-				var attachments = [];
-				for(var name in files) {
-					var file 		= files[name];
-					var extension   = extensionOf(name);
-					var contentType = contentTypeOf(extension);
-					var blob    	= new Blob([file._data.getContent()], {
-						'type': contentType
-					});
-
-					var blobUrl = URL.createObjectURL(blob);
-					var thumb   = roadmap.getExtensionThumb(extension);
-					if(! thumb) {
-						thumb = blobUrl;
-					}
-
-					attachments.push({
-						// The file blob url
-						'url'  : blobUrl,
-						// The thumb image that is visible on an issue footer
-						'thumb': thumb,
-						// Currently the file is an image if the two url are the same (images can be used for preview but not the other types like pdf so we use a specific image to preview the file)
-						'image': (blobUrl === thumb),
-						// The name of the file
-						'name' : name
-					});
-				}
-
+				// Get formatted attachments
+				var attachments = processFiles(files, roadmap);
 				$scope.$evalAsync(function() {
 					// Cache the attachments with the issue
 					$scope.issue.attachments = attachments;
@@ -172,7 +187,7 @@
 					'issue': issueId,
 					'extract': {
 						'callback': callback,
-						'filter': filter
+						'filter'  : filter
 					}
 				});
 			}
@@ -392,8 +407,7 @@
 			return issue.fields.status.name === 'Resolved';
 		};
 
-		$scope.showImage = function($event, issueId) {
-			var elm = $($event.currentTarget);
+		$scope.showImage = function(issueId) {
 	        $('a.img-issue-' + issueId).colorbox({
 	        	'rel'  		: 'img-issue-' + issueId,
 	        	'photo' 	: true,

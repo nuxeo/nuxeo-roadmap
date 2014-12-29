@@ -9,17 +9,62 @@
  */
 
 (function($) {
+
+    var ZIP_REGEX       = /\.zip$/i;
+    var MAC_OSX_REGEX   = /^__MACOSX/i;
+
     // Utility functions
     var functions = {
         // Safely get options
         getOptions: function(options) {
-            return $.extend({
-                // 
-            }, options);
+            // Nothing to do
+            return options;
         },
+        /*
+         * The options object must look like:
+         *      - data: The binary content of the zip file
+         *      - filter: A regex that will be used in order to reduce the files
+         */
+        unzip: function(options) {
+            var data    = options.data;
+            if(! data) {
+                throw new Error('data must be a valid object');
+            }
+
+            var filter      = options.filter;
+            var applyFilter = typeof filter.test == 'function';
+            var zip         = new JSZip(data);
+            var files       = {};
+
+            for(var i in zip.files) {
+                var file = zip.files[i];
+                var name = file.name;
+
+                if(MAC_OSX_REGEX.test(name)) {
+                    // Ignore macosx content
+                    continue;
+                }
+
+                if(ZIP_REGEX.test(name)) {
+                    console.log('Found zip file ... recursive process');
+                    // Get the inner files
+                    files[name] = functions.unzip({
+                        'data'  : file.asBinary(),
+                        'filter': filter
+                    });
+
+                    console.log('Zip file processing done');
+                }
+                else if(applyFilter && filter.test(name)) {
+                    files[name] = file;
+                }
+            }
+
+            return files;
+        } ,
         // Exposed for the jquery 'zip' plugin
         exposed: { 
-            uncompress: function(options) {
+            extract: function(options) {
                 if(! window.JSZipUtils || ! window.JSZip) {
                     throw new Error('You have to load the jszip and jszip-utils api in order to invoke the extract action');
                 }
@@ -46,37 +91,13 @@
                         throw err;
                     }
 
-                    // Create a new jszip instance in order to read the archive
-                    var zip     = new JSZip(data);
-                    // The final files which will be passed to the callback
-                    var files   = {};
-                    // A filter that can reduce the files that will be passed to the callback
-                    var filter  = options.filter;
-                    // A filter in any object that has a 'test' method
-                    if(filter && typeof filter.test === 'function') {
-                        console.log('A filter has been detected ... process filter');
-                        // Iter on each files and check the filter
-                        for(var i in zip.files) {
-                            var file = zip.files[i];
-                            // Check if the file pass the filter
-                            if(filter.test(file.name)) {
-                                files[file.name] = file;
-                            }
-                        }
-                    }
-                    else {
-                        files = zip.files;
-                    }
-
-                    zip.files   = null;
-                    zip         = null;
+                    var files = functions.unzip({
+                        'data'  : data,
+                        'filter': options.filter
+                    });
 
                     callback(files);
                 });
-            },
-            // Simple alias to the functions.exposed.uncompress method
-            extract: function() {
-                return functions.exposed.uncompress.apply(this, arguments);
             }
         }
     };

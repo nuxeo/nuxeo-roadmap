@@ -74,7 +74,7 @@
       </div>
 
       <div class="col-md-9" id="issues" ng-controller="issues">
-        <div class="row" ng-controller="components" style="margin-bottom: 28px;margin-top: 6px;">
+        <div class="row" ng-controller="components" style="margin-bottom: 28px; margin-top: 6px;">
           <select style="width: 100%" multiple="multiple" id="components">
             <option value="{{cmp.id}}" ng-repeat="cmp in components">{{cmp.name}}</option>
           </select>
@@ -103,7 +103,7 @@
                 <a
                   title="{{attachment.name}}"
                   href="{{attachment.url}}" ng-class="attachment.image ? 'img-issue-' + issue.id : ''"
-                  ng-attr-target="{{attachment.image ? '' : '_blank'}}" ng-click="showImage($event, issue.id)"
+                  ng-attr-target="{{attachment.image ? '' : '_blank'}}" ng-click="showImage(issue.id)"
                   ng-repeat="attachment in issue.attachments">
                     <img style="margin-right: 5px" height="64" src="{{attachment.thumb}}">
                 </a>
