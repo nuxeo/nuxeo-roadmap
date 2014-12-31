@@ -17,6 +17,17 @@
 		};
 	}();
 
+	function prioritySort(x, y) {
+		// Sort by prority id
+		var sort =  x.fields.priority.id - y.fields.priority.id;
+		// If equals sort by creation order (id)
+		if(sort == 0) {
+			return - (x.id - y.id);
+		}
+
+		return sort;
+	}
+
 	function fileInfo(file, roadmap) {
 		var extension   = extensionOf(file.name);
 		var contentType = contentTypeOf(extension);
@@ -29,6 +40,8 @@
 		if(! thumb) {
 			thumb = blobUrl;
 		}
+
+		file._data = EMPTY_UINT8_ARRAY;
 
 		return {
 			// The file blob url
@@ -57,14 +70,14 @@
 		return attachments;
 	}
 
-	// Get the content from a filename by extraxcting the extension
+	// Get the content from a filename by extracting the extension
 	function contentTypeOf(ext) {
 		return CONTENT_TYPES[ext];
 	}
 
 	function extensionOf(filename) {
 		var idx = filename.lastIndexOf('.');
-		if(idx <= 0) {
+		if(idx < 0) {
 			return false;
 		}
 
@@ -86,12 +99,12 @@
 	/*
 	 * File that are conserved for rendering (preview in the issue footer).
 	 * 
-	 * Files that are not images should also be added in CONTENT_TYPES_THUMBS object
+	 * Files that are not images should also be added in EXTENSIONS_THUMBS object
 	 * with their associated thumb. In addition to this, you must also check if the file extension is in CONTENT_TYPES.
 	 */
 	var ATTACHMENTS_FILTER	  = /\.(png|jpeg|jpg|gif|pdf)$/i;
 
-	// Thumbs for content types (see ATTACHMENTS_FILTER)
+	// Thumbs for files extensions (see ATTACHMENTS_FILTER)
 	var EXTENSIONS_THUMBS = {
 		'pdf': '/img/thumbs/pdf.png'
 	};
@@ -101,7 +114,10 @@
 	var JIRA_PROJECT 		  = 'NXROADMAP';
 
 	// Issues (all) cache
-	var CACHE 		= [];
+	var CACHE 		= new Array(75);
+
+	var EMPTY_UINT8_ARRAY 	= new Uint8Array(0);
+	var EMPTY_ARRAY 		= new Array(0);
 
 	// Event constants
 	var NXEVENT = {
@@ -112,7 +128,7 @@
 	};
 
 	// Roadmap module
-	angular.module('nxroadmap', [])
+	angular.module('nxroadmap', EMPTY_ARRAY)
 
 	// Required in order to remove the 'unsafe' prefix added in links hrefs
 	.config(['$compileProvider', function($compileProvider) {
@@ -122,15 +138,11 @@
 	// This directive automatically add an 'attachments' property on the available issue for the current scope
 	.directive('issueAttachments', function(jira, roadmap) {
 	  return {
-	    //template: '<span ng-repeat="f in issue.files">{{f}}</span>',
 	    compile: function(element, attributes) {
 	    	return {
 	            pre: function(scope, element, attributes, controller, transcludeFn) {
 	            	// Cache the element in order to use it in the controller function
 	            	scope.elm = element;
-	            },
-	            post: function(scope, element, attributes, controller, transcludeFn) {
-	            	//
 	            }
 	        };
      	},
@@ -236,16 +248,7 @@
 				return issues;
 			}
 
-			issues.sort(function(x, y) {
-				// Sort by prority id
-				var sort =  x.fields.priority.id - y.fields.priority.id;
-				// If equals sort by creation order (id)
-				if(sort == 0) {
-					return - (x.id - y.id);
-				}
-
-				return sort;
-			});
+			issues.sort(prioritySort);
 
 			return issues;
 		}
@@ -255,11 +258,10 @@
 	.filter('reduce', function() {
 		return function(issues, versions, selection) {
 			// Components to filter
-			var components 	= selection.components || [];
+			var components 	= selection.components || EMPTY_ARRAY;
 			// Versions to filter
 			var versionsIds = [];
 			if(selection.version) {
-				// TODO: Add the lts id to the versionsIds only if the current selection is a lts
 				var versionsIds = selection.version.lts ? versions.versionsIds[selection.version.id] : [selection.version.id];
 			}
 
