@@ -143,7 +143,7 @@
 			version.is_lts = version.name.indexOf('LTS') === 0;
 
             var currentDate  = new Date();
-            var startingDate = new Date(version.jsDate.getFullYear(), version.jsDate.getMonth() - 2, version.jsDate.getDay() + 1);
+            var startingDate = new Date(version.jsDate.getFullYear(), version.jsDate.getMonth() - 2, version.jsDate.getDate() + 1);
 
             if(version.released && version.is_lts) {
                 version.panel = 'success';
