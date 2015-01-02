@@ -22,6 +22,8 @@ js/nxloader.plugin.js
 
 lib/jszip.packaged.min.js
 
+about.html
+
 css/nuxeo.css
 
 img/loader.svg
