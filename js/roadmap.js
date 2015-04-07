@@ -1,6 +1,83 @@
 'use strict';
 
 (function() {
+	/**
+	 * Handle browser hash in order to trigger some piece of codes based on the ROUTES constant
+	 */
+	if("onhashchange" in window) {
+		console.log('History is supported by this browser');
+		$(window).on('hashchange', function() {
+			var hash = window.location.hash;
+			if(hash.indexOf('#/') == 0) {
+				hash = hash.substr(2);
+			}
+
+			$.each(ROUTES, function(index, route) {
+				var matches = route.pattern.exec(hash);
+				if(matches) {
+					var handler = route.scopedHandler || route.handler;
+					if(route.binder) {
+						handler(route.binder(matches));
+					}
+					else {
+						handler(matches);
+					}
+				}
+			});
+		});
+	}
+
+	var ROUTES = [{
+		'pattern': /^issues\/(.*)/,
+		'binder' : function(matches) {
+			return matches[1];
+		},
+		'handler': displayItem
+	}];
+
+	function displayItem(itemId) {
+		var founded = null;
+		$.each(CACHE, function(idx, issue) {
+			// Match on id or key
+			if(issue.id == itemId || issue.key == itemId) {
+				founded = issue;
+				return false;
+			}
+		});
+
+		if(founded) {
+			displayIssue.apply(this, [founded]);
+		}
+		else {
+			console.debug('Unable to find the issue ' + itemId);
+		}
+	}
+
+	function displayIssue(issue) {
+		// Get the fixVersion and the assoociated LTS
+		var fixVersions = issue.fields.fixVersions;
+		var ltsId = -1;
+		try {
+			ltsId = VERSIONS.getLTS(fixVersions[0].id);
+		}
+		catch(e) {
+			console.debug(e);
+		}
+		finally {
+			if(ltsId == -1) {
+				console.log('Unable to trigger LTS click for the permlinked');
+				return;
+			}
+		}
+
+		// Trigger issues filtering / LTS
+		this.filterIssuesByLts(ltsId, true, function() {
+			console.debug($('div[data-issue='+ issue.id +']'));
+			// Once filtered - add the class permlink on the issue
+			$('div[data-issue='+ issue.id +']').addClass('permlink');
+		});
+	}
+
 	/* 
 	 * lookup method used to retrieve and cache jquery selections.
 	 * !!! Build for being used only for statics elements (element lookup that will never change) !!!
@@ -29,7 +106,7 @@
 		'zip' : 'application/zip'
 	};
 
-	// Get the content from a filename by extraxcting the extension
+	// Get the content from a filename by extracting the extension
 	function contentTypeOf(ext) {
 		return CONTENT_TYPES[ext];
 	}
@@ -56,6 +133,7 @@
 
 	// Issues (all) cache
 	var CACHE 		= [];
+	var VERSIONS    = null;
 
 	// Event constants
 	var NXEVENT = {
@@ -172,7 +250,7 @@
 					'issue': issueId,
 					'extract': {
 						'callback': callback,
-						'filter': filter
+						'filter'  : filter
 					}
 				});
 			}
@@ -322,24 +400,29 @@
 			$scope.$broadcast(NXEVENT.FILTER_BY_SELECTION);
 		};
 
-		$scope.filterIssuesByLts = function(ltsId, clear) {
+		//TODO : Fix incoherence
+		$scope.filterIssuesByLts = function(ltsId, clear, callback) {
 			// If clear is set to true then unselect the current active ft version
 			if(clear === true) {
 				$('#versions .active').removeClass('active');
-
-				// If we're here we're sure that the method call is triggered by the user click.
-				// At this point we have to check if the selected lts isn't already displayed.
-				if(ltsId === roadmap.getVersionSelection().id) {
-					console.debug('LTS ' + ltsId + ' already displayed');
-					return;
-				}
 			}
 
-			// Force to use a version selection in order to avoid weird behavior when a LTS is selected
-			$scope.$broadcast(NXEVENT.FILTER_BY_SELECTION, {
-				lts: true,
-				id : ltsId
-			});
+			var selection = roadmap.getVersionSelection();
+			if(ltsId != selection.id) {
+				$('.collapse.in').collapse('hide');
+				$('#collapse-' + ltsId).collapse('show');
+			
+				// Force to use a version selection in order to avoid weird behavior when a LTS is selected
+				$scope.$broadcast(NXEVENT.FILTER_BY_SELECTION, {
+					lts: true,
+					id : ltsId
+				});
+			}
+		
+			if(typeof callback === 'function') {
+				console.log('Call callback');
+				callback();
+			}
 		};
 
 		$scope.trusted = function(input) {
@@ -402,7 +485,7 @@
 		};
 
 		$scope.$on(NXEVENT.VERSIONS_LOADED, function(event, versions) {
-			$scope.versions = versions;
+			$scope.versions = VERSIONS = versions;
 
 			var callbacks = [];
 			// Prepare an array of deferred which old issues querying for one LTS and it's associated FTs
@@ -442,11 +525,27 @@
 
 					// Open the panel which hold the current LTS and retrieve this version id
 					var ltsId = $('.panel-info div[role=tabpanel]')
-									.addClass('in')
-									.parent('.panel')
-									.attr('data-version');
+						.addClass('in')
+						.parent('.panel')
+						.attr('data-version');
 					// Fire event which will take care of LTS filtering based on the current LTS
 					$scope.filterIssuesByLts(ltsId);
+
+					// Bind the handler functions to $scope.$parent
+					for(var key in ROUTES) {
+						var routeItem = ROUTES[key];
+						if(routeItem.scoped === undefined || routeItem.scoped === true) {
+							routeItem.scopedHandler = function() {
+								var args = arguments;
+								$timeout(function() {
+									routeItem.handler.apply($scope.$parent, args);
+								});
+							};
+						}
+					}
+
+					// Trigger hashchange when versions and issues has been loaded
+					$(window).trigger('hashchange');
 				});
 			});
 		});
@@ -458,7 +557,7 @@
 			if(versionSelection) {
 				// Force usage of the passed selection
 				selection = {
-					components 	: roadmap.getComponentsSelection(),
+					components	: roadmap.getComponentsSelection(),
 					version 	: versionSelection
 				}
 			}

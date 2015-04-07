@@ -222,6 +222,23 @@
     Versions.prototype.isDisplayableVersion = function(version) {
             return ! version.archived && (version.name.indexOf("LTS") === 0 || version.name.indexOf("FT")  === 0);
 	};
+	Versions.prototype.getLTS = function(versionId) {
+		for(var key in this.versions) {
+			// Check if the LTS is the versionId
+			if(key == versionId) {
+				return key;
+			}
+
+			var fts = this.versions[key];
+			for(var i in fts) {
+				if(fts[i].id == versionId) {
+					return key;
+				}
+			}
+		}
+
+		return -1;
+	};
     // Get FT of the passed LTS
     Versions.prototype.getVersions = function(lts_id) {
         var fts = this.versions[lts_id];
