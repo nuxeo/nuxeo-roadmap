@@ -169,10 +169,6 @@
             }
             else {
                 version.panel = 'warning';
-                console.debug(version.name);
-                console.debug(startingDate);
-                console.debug(version.jsDate);
-                console.log('----');
                 if(startingDate <= currentDate && currentDate <= version.jsDate) {
                     version.current = true;
                     self.activeVersionId = version.id;
