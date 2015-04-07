@@ -143,7 +143,41 @@
 			version.is_lts = version.name.indexOf('LTS') === 0;
 
             var currentDate  = new Date();
-            var startingDate = new Date(version.jsDate.getFullYear(), version.jsDate.getMonth() - 2, version.jsDate.getDate() + 1);
+            var startingDate = null;
+
+            /*
+             * Set the startingDate to the last version release date + 1 day
+             * If the checked version is the first (then we doesn't have a last version) the starting date will be the current released date - 2 month + 1 day
+             *
+             */
+            try {
+            	// Get the previous version
+            	var prevVersion = data[i - 1];
+	            if (prevVersion) {
+	            	startingDate =  new Date(prevVersion.jsDate.getFullYear(), prevVersion.jsDate.getMonth(), prevVersion.jsDate.getDate() + 1);
+	        	}
+        	}
+        	catch(e) {}	// Catch data[i - 1] out of bounds error
+        	finally {
+        		if(!startingDate) {
+        			startingDate =  new Date(version.jsDate.getFullYear(), version.jsDate.getMonth() - 2, version.jsDate.getDate() + 1);
+        		}
+        	}
+
+            if(version.released && version.is_lts) {
+                version.panel = 'success';
+            }
+            else {
+                version.panel = 'warning';
+                console.debug(version.name);
+                console.debug(startingDate);
+                console.debug(version.jsDate);
+                console.log('----');
+                if(startingDate <= currentDate && currentDate <= version.jsDate) {
+                    version.current = true;
+                    self.activeVersionId = version.id;
+                }
+            }
 
             if(version.released && version.is_lts) {
                 version.panel = 'success';
