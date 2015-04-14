@@ -232,23 +232,21 @@
 	  };
 	})
 
-	
 	.directive('popoverHack', function($timeout, $compile) {
 		return {
 			link: function($scope, elm, attrs) {
-				if (true) {
-					$timeout(function() {
-						//$('#issues [data-toggle="popover"]').popover();
-						$('#title-' + $scope.issue.id).popover({
-							html: true,
-							title: 'Permlink',
-							content: '<div class="form-group"> ' +
-			            		'<input size="27" type="text" autofocus onFocus="this.select();" class="form-control" value="roadmap.nuxeo.com/#/issues/ '+ $scope.issue.id +'" />' +
-			        		'</div>'
-						});
+				$timeout(function() {
+					$('#title-' + $scope.issue.id).popover({
+						html: true,
+						title: 'Permalink',
+						content: '<div class="form-group"> ' +
+		            		'<input size="27" type="text" onFocus="this.select()" class="form-control" value="'+ HOST +'/#/issues/'+ $scope.issue.id +'" >' +
+		        		'</div>'
+					}).on('shown.bs.popover', function() {
+						$(this).parent().find('.form-group > input').focus();
 					});
-				}
-	     	}
+				});
+			}
 	  	};
 	})
 
@@ -389,7 +387,7 @@
 					for(var j in issue.fields.components) {
 						issueComponents.push(issue.fields.components[j].id);
 					}
-					
+
 					if(issueComponents) {
 						for(var l in components) {
 							var cmpId = components[l];
@@ -423,7 +421,7 @@
 		$scope.filterIssuesByVersion = function(versionId) {
 			// Short circuit the broadcasts if the clicked version is already selected
 			if(versionId === roadmap.getVersionSelection().id) {
-				console.log('Version is already selected');
+				console.log('Version already selected');
 				return;
 			}
 
@@ -452,7 +450,6 @@
 
 			var selection = roadmap.getVersionSelection();
 			if(ltsId != selection.id) {
-				console.debug('FIRE');
 				$('.collapse.in').collapse('hide');
 				$('#collapse-' + ltsId).collapse('show');
 
