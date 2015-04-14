@@ -65,17 +65,29 @@
 		}
 		finally {
 			if(ltsId == -1) {
-				console.log('Unable to trigger LTS click for the permlinked');
+				console.log('Unable to trigger LTS click for the permlink');
 				return;
 			}
 		}
 
+		var scope = this;
+		// Cache the permlinked issue in the scope
+		this.permlinked = issue.id;
 		// Trigger issues filtering / LTS
-		this.filterIssuesByLts(ltsId, true, function() {
-			console.debug($('div[data-issue='+ issue.id +']'));
-			// Once filtered - add the class permlink on the issue
-			$('div[data-issue='+ issue.id +']').addClass('permlink');
+		this.filterIssuesByLts(ltsId, true, function(same) {
+			scope.fireHightlightPermlinked();
 		});
+	}
+
+	function hightlightPermlinked() {
+		var sel = $('.permlinked');
+		if(sel.size() > 0) {
+			$.colorbox({
+				inline: true,
+				width: '50%',
+				href: sel
+			});	
+		}
 	}
 
 	/* 
@@ -105,6 +117,8 @@
 		'json': 'application/json',
 		'zip' : 'application/zip'
 	};
+
+	var HOST = location.protocol + '//' + location.hostname + (location.port ? (':' + location.port) : '');
 
 	// Get the content from a filename by extracting the extension
 	function contentTypeOf(ext) {
@@ -137,10 +151,11 @@
 
 	// Event constants
 	var NXEVENT = {
-		VERSION_CLICK 		: 'version.click',
-		VERSIONS_LOADED		: 'versions.loaded',
-		COMPONENTS_LOADED 	: 'components.loaded',
-		FILTER_BY_SELECTION	: 'filter.selection'
+		VERSION_CLICK 		  : 'version.click',
+		VERSIONS_LOADED		  : 'versions.loaded',
+		COMPONENTS_LOADED 	  : 'components.loaded',
+		FILTER_BY_SELECTION	  : 'filter.selection',
+		HIGHTLIGHT_PERMLINKED : 'hightlight.permlinked'
 	};
 
 	// Thumbs for content types (see ATTACHMENTS_FILTER)
@@ -215,6 +230,26 @@
 			}, ATTACHMENTS_FILTER);
 	    }
 	  };
+	})
+
+	
+	.directive('popoverHack', function($timeout, $compile) {
+		return {
+			link: function($scope, elm, attrs) {
+				if (true) {
+					$timeout(function() {
+						//$('#issues [data-toggle="popover"]').popover();
+						$('#title-' + $scope.issue.id).popover({
+							html: true,
+							title: 'Permlink',
+							content: '<div class="form-group"> ' +
+			            		'<input size="27" type="text" autofocus onFocus="this.select();" class="form-control" value="roadmap.nuxeo.com/#/issues/ '+ $scope.issue.id +'" />' +
+			        		'</div>'
+						});
+					});
+				}
+	     	}
+	  	};
 	})
 
 	// Wrap jira plugin call
@@ -376,7 +411,15 @@
 	})
 
 	// Base controller
-	.controller('root', function($scope, $sce, roadmap) {
+	.controller('root', function($scope, $sce, roadmap, $timeout) {
+		$scope.isPermlinked = function(issue) {
+			return $scope.permlinked == issue.id;
+		};
+
+		$scope.fireHightlightPermlinked = function() {
+			$scope.$broadcast(NXEVENT.HIGHTLIGHT_PERMLINKED);
+		};
+
 		$scope.filterIssuesByVersion = function(versionId) {
 			// Short circuit the broadcasts if the clicked version is already selected
 			if(versionId === roadmap.getVersionSelection().id) {
@@ -409,19 +452,19 @@
 
 			var selection = roadmap.getVersionSelection();
 			if(ltsId != selection.id) {
+				console.debug('FIRE');
 				$('.collapse.in').collapse('hide');
 				$('#collapse-' + ltsId).collapse('show');
-			
+
 				// Force to use a version selection in order to avoid weird behavior when a LTS is selected
 				$scope.$broadcast(NXEVENT.FILTER_BY_SELECTION, {
 					lts: true,
 					id : ltsId
 				});
 			}
-		
+
 			if(typeof callback === 'function') {
-				console.log('Call callback');
-				callback();
+				callback(ltsId == selection.id);
 			}
 		};
 
@@ -484,6 +527,12 @@
 	        });
 		};
 
+		$scope.$on(NXEVENT.HIGHTLIGHT_PERMLINKED, function(event) {
+			$timeout(function() {
+				hightlightPermlinked();
+			});
+		});
+
 		$scope.$on(NXEVENT.VERSIONS_LOADED, function(event, versions) {
 			$scope.versions = VERSIONS = versions;
 
@@ -519,41 +568,49 @@
 					}
 				});
 
+				// Bind the handler functions to $scope.$parent
+				for(var key in ROUTES) {
+					var routeItem = ROUTES[key];
+					if(routeItem.scoped === undefined || routeItem.scoped === true) {
+						routeItem.scopedHandler = function() {
+							var args = arguments;
+							$timeout(function() {
+								routeItem.handler.apply($scope.$parent, args);
+							});
+						};
+					}
+				}
+
 				$scope.$apply(function() {
 					// Filter issues by priority, cache them and update scope
-					$scope.issues = CACHE = $filter('priority')(collectedIssues);
+					CACHE = $filter('priority')(collectedIssues);
+
+					if(window.location.hash) {
+						console.debug('We have a location hash - trigger hashchange');
+						// Trigger hashchange when versions and issues has been loaded
+						$(window).trigger('hashchange');
+						return;
+					}
 
 					// Open the panel which hold the current LTS and retrieve this version id
 					var ltsId = $('.panel-info div[role=tabpanel]')
-						.addClass('in')
+						//.addClass('in')
 						.parent('.panel')
 						.attr('data-version');
 					// Fire event which will take care of LTS filtering based on the current LTS
 					$scope.filterIssuesByLts(ltsId);
-
-					// Bind the handler functions to $scope.$parent
-					for(var key in ROUTES) {
-						var routeItem = ROUTES[key];
-						if(routeItem.scoped === undefined || routeItem.scoped === true) {
-							routeItem.scopedHandler = function() {
-								var args = arguments;
-								$timeout(function() {
-									routeItem.handler.apply($scope.$parent, args);
-								});
-							};
-						}
-					}
-
-					// Trigger hashchange when versions and issues has been loaded
-					$(window).trigger('hashchange');
 				});
 			});
 		});
 
 		// Filter issues based on the current selection
 		$scope.$on(NXEVENT.FILTER_BY_SELECTION, function(event, versionSelection) {
-			var selection = null;
+			if($scope.issues === undefined) {
+				// Lazy set the issues in the scope - avoid early call to the permlinked directive
+				$scope.issues = CACHE;
+			}
 
+			var selection = null;
 			if(versionSelection) {
 				// Force usage of the passed selection
 				selection = {

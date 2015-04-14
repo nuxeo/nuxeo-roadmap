@@ -289,3 +289,15 @@ a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.acti
 .jumbotron > .col-md-9 {
   padding-left:0;
 }
+
+#permlinked .permlinked {
+  border: dashed 2px rgb(160, 160, 160);
+}
+
+#issues {
+  margin-top: 10px;
+}
+
+.panel-title > span {
+  cursor: pointer;
+}
