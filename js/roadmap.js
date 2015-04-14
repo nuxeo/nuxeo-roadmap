@@ -65,7 +65,7 @@
 		}
 		finally {
 			if(ltsId == -1) {
-				console.log('Unable to trigger LTS click for the permlink');
+				console.log('Unable to trigger LTS click for the permalink');
 				return;
 			}
 		}
@@ -232,20 +232,26 @@
 	  };
 	})
 
-	.directive('popoverHack', function($timeout, $compile) {
+	.directive('popoverHack', function($timeout) {
 		return {
 			link: function($scope, elm, attrs) {
-				$timeout(function() {
-					$('#title-' + $scope.issue.id).popover({
-						html: true,
-						title: 'Permalink',
-						content: '<div class="form-group"> ' +
-		            		'<input size="27" type="text" onFocus="this.select()" class="form-control" value="'+ HOST +'/#/issues/'+ $scope.issue.id +'" >' +
-		        		'</div>'
-					}).on('shown.bs.popover', function() {
-						$(this).parent().find('.form-group > input').focus();
+				if($scope.$last === true) {
+					$timeout(function() {
+						$('div[data-issue]').each(function(i, elm) {
+							var issueId = $(elm).data('issue');
+							$('#title-' + issueId).popover({
+								trigger: 'click',
+								html: true,
+								title: 'Permalink',
+								content: '<div class="form-group"> ' +
+				            		'<input size="27" type="text" onFocus="this.select()" class="form-control" value="'+ HOST +'/#/issues/'+ issueId +'">' +
+				        		'</div>'
+							}).on('shown.bs.popover', function() {
+								//$(this).parent().find('.form-group input').trigger('focus');
+							});
+						});
 					});
-				});
+				}
 			}
 	  	};
 	})
@@ -526,6 +532,8 @@
 
 		$scope.$on(NXEVENT.HIGHTLIGHT_PERMLINKED, function(event) {
 			$timeout(function() {
+				// Close the current popover if displayed
+				$('#title-' + $scope.permlinked).click();
 				hightlightPermlinked();
 			});
 		});
