@@ -173,9 +173,8 @@
 	}])
 
 	// This directive automatically add an 'attachments' property on the available issue for the current scope
-	.directive('issueAttachments', function(jira, roadmap) {
+	.directive('issueAttachments', function(jira, roadmap, $timeout) {
 	  return {
-	    //template: '<span ng-repeat="f in issue.files">{{f}}</span>',
 	    compile: function(element, attributes) {
 	    	return {
 	            pre: function(scope, element, attributes, controller, transcludeFn) {
@@ -226,6 +225,12 @@
 				$scope.$evalAsync(function() {
 					// Cache the attachments with the issue
 					$scope.issue.attachments = attachments;
+					if($scope.permlinked === $scope.issue.id) {
+						// Resize the popup if this issue is permlinked
+						$timeout(function() {
+							$.colorbox.resize();
+						});
+					}
 				});
 			}, ATTACHMENTS_FILTER);
 	    }
@@ -246,8 +251,6 @@
 								content: '<div class="form-group"> ' +
 				            		'<input size="27" type="text" onFocus="this.select()" class="form-control" value="'+ HOST +'/#/issues/'+ issueId +'">' +
 				        		'</div>'
-							}).on('shown.bs.popover', function() {
-								//$(this).parent().find('.form-group input').trigger('focus');
 							});
 						});
 					});
@@ -498,7 +501,6 @@
 
 				// Defer components change binding
 				$timeout(function() {
-					//$('#components').chosen({
 					lookup('#components').chosen({
 						placeholder_text_multiple: 'Select component(s) for issues filtering'
 					}).change(function() {
@@ -533,7 +535,11 @@
 		$scope.$on(NXEVENT.HIGHTLIGHT_PERMLINKED, function(event) {
 			$timeout(function() {
 				// Close the current popover if displayed
-				$('#title-' + $scope.permlinked).click();
+				if($('.popover').size() > 0) {
+					console.log('Hide popover');
+					$('#title-' + $scope.permlinked).click();
+				}
+
 				hightlightPermlinked();
 			});
 		});
