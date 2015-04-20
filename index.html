@@ -88,7 +88,7 @@
               <div data-issue="{{issue.id}}" class="panel panel-default {{isResolved(issue) ? 'issue-resolved' : ''}} {{isPermlinked(issue) ? 'permlinked' : ''}}" ng-repeat="issue in issues" popover-hack>
                 <div class="panel-heading">
                   <h4 class="panel-title">
-                    <span id="title-{{issue.id}}">{{issue.fields.summary}}</span>
+                    <span id="title-{{issue.id}}">{{issue.fields.summary}}</span><span class="loader-container"></span>
 
                     <div class="btn-group pull-right">
                       <a ng-if="issue.fields.customfield_10902" target="_blank" title="Link to sources" href="{{issue.fields.customfield_10902}}"><span class="glyphicon glyphicon-eye-open"></span></a>

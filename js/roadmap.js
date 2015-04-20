@@ -45,6 +45,9 @@
 			}
 		});
 
+		// Avoid issue to be vertically append in a popup if we update the hash and the current popup is visible 
+		$.colorbox.remove();
+
 		if(founded) {
 			displayIssue.apply(this, [founded]);
 		}
@@ -80,18 +83,20 @@
 	}
 
 	function hightlightPermlinked() {
-		var sel = $('.permlinked');
+		var sel = $('.permlinked').clone();
+		// Remove attachments since diaporama is broken (only on exit because it close this popup)
+		sel.find('.panel-footer').remove();
 		if(sel.size() > 0) {
 			$.colorbox({
 				inline: true,
-				width: '50%',
+				width: '65%',
 				href: sel
 			});	
 		}
 	}
 
 	/* 
-	 * lookup method used to retrieve and cache jquery selections.
+	 * lookup method used to retrieve and cache jquery selections;.
 	 * !!! Build for being used only for statics elements (element lookup that will never change) !!!
 	 */
 	var lookup = function() {
@@ -193,6 +198,11 @@
 	    		return;
 	    	}
 
+	    	$timeout(function() {
+	    		// Set attachments loader img
+	    		$('div[data-issue='+ $scope.issue.id +']').find('.loader-container').nxloader('show');
+	    	});
+
 	    	// Download attachments for the current issue
 			jira.getAttachments($scope.issue.id, function(files) {
 				var attachments = [];
@@ -215,7 +225,7 @@
 						'url'  : blobUrl,
 						// The thumb image that is visible on an issue footer
 						'thumb': thumb,
-						// Currently the file is an image if the two url are the same (images can be used for preview but not the other types like pdf so we use a specific image to preview the file)
+						// Currently the file is an image if the two urls are the same (images can be used for preview but not the other types like pdf so we use a specific image to preview the file)
 						'image': (blobUrl === thumb),
 						// The name of the file
 						'name' : name
@@ -223,8 +233,12 @@
 				}
 
 				$scope.$evalAsync(function() {
+					$timeout(function() {
+						// Remove attachments loader img
+						$('div[data-issue='+ $scope.issue.id +']').find('.loader-container').nxloader('hide');
+					});
+	    			$scope.issue.attachments = attachments;
 					// Cache the attachments with the issue
-					$scope.issue.attachments = attachments;
 					if($scope.permlinked === $scope.issue.id) {
 						// Resize the popup if this issue is permlinked
 						$timeout(function() {

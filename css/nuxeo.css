@@ -301,3 +301,15 @@ a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.acti
 .panel-title > span {
   cursor: pointer;
 }
+
+.loader-container img {
+  display: inline;
+  width: 45px;
+  height: 20px;
+  line-height: 20px;
+  background: #0075b0;
+  margin-right: 15px;
+  float: left;
+  clear: both;
+  border-radius: 10px;
+}
