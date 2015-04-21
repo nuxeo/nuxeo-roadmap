@@ -85,7 +85,7 @@
               <div id="issues-loader" style="width: 100%; background-color: rgb(140,140,140); display: none;"></div>
             </div>
             <div id="issues" class="row">
-              <div data-issue="{{issue.id}}" class="panel panel-default {{isResolved(issue) ? 'issue-resolved' : ''}} {{isPermlinked(issue) ? 'permlinked' : ''}}" ng-repeat="issue in issues" popover-hack>
+              <div data-issue="{{issue.id}}" class="panel panel-default {{isResolved(issue) ? 'issue-resolved' : ''}}" ng-repeat="issue in issues" popover-hack>
                 <div class="panel-heading">
                   <h4 class="panel-title">
                     <span id="title-{{issue.id}}">{{issue.fields.summary}}</span><span class="loader-container"></span>

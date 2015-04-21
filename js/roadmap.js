@@ -16,12 +16,15 @@
 				var matches = route.pattern.exec(hash);
 				if(matches) {
 					var handler = route.scopedHandler || route.handler;
-					if(route.binder) {
-						handler(route.binder(matches));
+					var binder = route.binder;
+					if(binder) {
+						handler(binder(matches));
 					}
 					else {
 						handler(matches);
 					}
+
+					return false;
 				}
 			});
 		});
@@ -32,68 +35,25 @@
 		'binder' : function(matches) {
 			return matches[1];
 		},
-		'handler': displayItem
+		'handler': function (issueId) {
+			this.permlinked = issueId;
+			this.permlinkedType = 'issue';
+			this.filterIssuesWithOnly(issueId);
+		}
+	}, {
+		'pattern': /^versions\/(.*)/,
+		'binder' : function(matches) {
+			return matches[1];
+		},
+		'handler': function(versionId) {
+			this.permlinked = versionId;
+			this.permlinkedType = 'version';
+			// Open appropriate LTS
+			// Trigger click
+			$('a[data-version='+ versionId +']').click();
+			//this.filterIssuesByVersion(versionId);
+		}
 	}];
-
-	function displayItem(itemId) {
-		var founded = null;
-		$.each(CACHE, function(idx, issue) {
-			// Match on id or key
-			if(issue.id == itemId || issue.key == itemId) {
-				founded = issue;
-				return false;
-			}
-		});
-
-		// Avoid issue to be vertically append in a popup if we update the hash and the current popup is visible 
-		$.colorbox.remove();
-
-		if(founded) {
-			displayIssue.apply(this, [founded]);
-		}
-		else {
-			console.debug('Unable to find the issue ' + itemId);
-		}
-	}
-
-	function displayIssue(issue) {
-		// Get the fixVersion and the assoociated LTS
-		var fixVersions = issue.fields.fixVersions;
-		var ltsId = -1;
-		try {
-			ltsId = VERSIONS.getLTS(fixVersions[0].id);
-		}
-		catch(e) {
-			console.debug(e);
-		}
-		finally {
-			if(ltsId == -1) {
-				console.log('Unable to trigger LTS click for the permalink');
-				return;
-			}
-		}
-
-		var scope = this;
-		// Cache the permlinked issue in the scope
-		this.permlinked = issue.id;
-		// Trigger issues filtering / LTS
-		this.filterIssuesByLts(ltsId, true, function(same) {
-			scope.fireHightlightPermlinked();
-		});
-	}
-
-	function hightlightPermlinked() {
-		var sel = $('.permlinked').clone();
-		// Remove attachments since diaporama is broken (only on exit because it close this popup)
-		sel.find('.panel-footer').remove();
-		if(sel.size() > 0) {
-			$.colorbox({
-				inline: true,
-				width: '65%',
-				href: sel
-			});	
-		}
-	}
 
 	/* 
 	 * lookup method used to retrieve and cache jquery selections;.
@@ -110,7 +70,6 @@
 			return elm;
 		};
 	}();
-
 	var CONTENT_TYPES = {
 		'png' : 'image/png',
 		'jpg' : 'image/jpeg',
@@ -160,7 +119,7 @@
 		VERSIONS_LOADED		  : 'versions.loaded',
 		COMPONENTS_LOADED 	  : 'components.loaded',
 		FILTER_BY_SELECTION	  : 'filter.selection',
-		HIGHTLIGHT_PERMLINKED : 'hightlight.permlinked'
+		FILTER_FOR_ONLY		  : 'filter.only'
 	};
 
 	// Thumbs for content types (see ATTACHMENTS_FILTER)
@@ -373,6 +332,18 @@
 	// Reduce an issues array based on the passed selection object
 	.filter('reduce', function() {
 		return function(issues, versions, selection) {
+			var issueId = selection.issue;
+			if(issueId) {	// We only have one issue to display
+				for(var i in issues) {
+					var issue = issues[i];
+					if(issue.id == issueId) {
+						return [issue];	// Found issue - return it
+					}
+				}
+				console.log('Issue ' +issueId+ ' not found');
+				return [];
+			}
+
 			// Components to filter
 			var components 	= selection.components || [];
 			// Versions to filter
@@ -433,14 +404,6 @@
 
 	// Base controller
 	.controller('root', function($scope, $sce, roadmap, $timeout) {
-		$scope.isPermlinked = function(issue) {
-			return $scope.permlinked == issue.id;
-		};
-
-		$scope.fireHightlightPermlinked = function() {
-			$scope.$broadcast(NXEVENT.HIGHTLIGHT_PERMLINKED);
-		};
-
 		$scope.filterIssuesByVersion = function(versionId) {
 			// Short circuit the broadcasts if the clicked version is already selected
 			if(versionId === roadmap.getVersionSelection().id) {
@@ -486,6 +449,58 @@
 			if(typeof callback === 'function') {
 				callback(ltsId == selection.id);
 			}
+		};
+
+		$scope.filterIssuesByCurrentLTS = function() {
+			var ltsId = $('.panel-info div[role=tabpanel]')
+				.parent('.panel')
+				.attr('data-version');
+			// Fire event which will take care of LTS filtering based on the current LTS
+			$scope.filterIssuesByLts(ltsId);
+		};
+
+		$scope.filterIssuesWithOnly = function(issueId) {
+			var found = null;
+			$.each(CACHE, function(idx, issue) {
+				// Match on id or key
+				if(issue.id == issueId || issue.key == issueId) {
+					found = issue;
+					return false; 
+				}
+			});
+
+			// Close current popover
+			//$('.popover').popover('destroy');
+
+			if(found === null) {
+				console.debug('Unable to find the permlinked issue ('+ issueId +') - filter by current LTS');
+				$scope.filterIssuesByCurrentLTS();
+				return;
+			}
+
+			var fixVersions = found.fields.fixVersions;
+			var ltsId = -1;
+			try {
+				ltsId = VERSIONS.getLTS(fixVersions[0].id);
+			}
+			catch(e) {
+				console.debug(e);
+			}
+			finally {
+				if(ltsId == -1) {
+					console.log('Unable to trigger LTS selection (no trigger filtering) for the permalink');
+					return;
+				}
+			}
+
+			var versionSel = roadmap.getVersionSelection();
+			if(!versionSel.lts || versionSel.id != ltsId) {
+				// Open associated LTS
+				$('.collapse.in').collapse('hide');
+				$('#collapse-' + ltsId).collapse('show');
+			}
+
+			$scope.$broadcast(NXEVENT.FILTER_FOR_ONLY, issueId);
 		};
 
 		$scope.trusted = function(input) {
@@ -546,18 +561,6 @@
 	        });
 		};
 
-		$scope.$on(NXEVENT.HIGHTLIGHT_PERMLINKED, function(event) {
-			$timeout(function() {
-				// Close the current popover if displayed
-				if($('.popover').size() > 0) {
-					console.log('Hide popover');
-					$('#title-' + $scope.permlinked).click();
-				}
-
-				hightlightPermlinked();
-			});
-		});
-
 		$scope.$on(NXEVENT.VERSIONS_LOADED, function(event, versions) {
 			$scope.versions = VERSIONS = versions;
 
@@ -597,41 +600,53 @@
 				for(var key in ROUTES) {
 					var routeItem = ROUTES[key];
 					if(routeItem.scoped === undefined || routeItem.scoped === true) {
-						routeItem.scopedHandler = function() {
-							var args = arguments;
-							$timeout(function() {
-								routeItem.handler.apply($scope.$parent, args);
-							});
-						};
+						routeItem.scopedHandler = (function(route) {
+							return function() {
+								var args = arguments;
+								$timeout(function() {
+									route.handler.apply($scope.$parent, args);
+								});
+							};
+						})(routeItem);
 					}
 				}
 
 				$scope.$apply(function() {
 					// Filter issues by priority, cache them and update scope
 					CACHE = $filter('priority')(collectedIssues);
-
 					if(window.location.hash) {
 						console.debug('We have a location hash - trigger hashchange');
 						// Trigger hashchange when versions and issues has been loaded
 						$(window).trigger('hashchange');
-						return;
 					}
+					else {
+						$scope.filterIssuesByCurrentLTS();
+					}
+				});
+			});
+		});
 
-					// Open the panel which hold the current LTS and retrieve this version id
-					var ltsId = $('.panel-info div[role=tabpanel]')
-						//.addClass('in')
-						.parent('.panel')
-						.attr('data-version');
-					// Fire event which will take care of LTS filtering based on the current LTS
-					$scope.filterIssuesByLts(ltsId);
+		$scope.$on(NXEVENT.FILTER_FOR_ONLY, function(event, issueId) {
+			if($scope.issues === undefined) {
+				// Lazy set the issues in the scope
+				$scope.issues = CACHE;
+			}
+
+			$timeout(function() {
+				// Reduce the displayed issues based on a selection
+				$scope.issues = $filter('reduce')(CACHE, $scope.versions, {	// Selection
+					issue: issueId
 				});
 			});
 		});
 
 		// Filter issues based on the current selection
 		$scope.$on(NXEVENT.FILTER_BY_SELECTION, function(event, versionSelection) {
+			// CLean hash
+			window.location.hash = '/';
+
 			if($scope.issues === undefined) {
-				// Lazy set the issues in the scope - avoid early call to the permlinked directive
+				// Lazy set the issues in the scope
 				$scope.issues = CACHE;
 			}
 
