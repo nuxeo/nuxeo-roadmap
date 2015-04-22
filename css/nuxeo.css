@@ -290,16 +290,12 @@ a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.acti
   padding-left:0;
 }
 
-#permlinked .permlinked {
-  border: dashed 2px rgb(160, 160, 160);
+.permalink {
+  cursor: pointer;
 }
 
 #issues {
   margin-top: 10px;
-}
-
-.panel-title > span {
-  cursor: pointer;
 }
 
 .loader-container img {

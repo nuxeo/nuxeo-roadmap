@@ -6,6 +6,7 @@
 	 */
 	if("onhashchange" in window) {
 		console.log('History is supported by this browser');
+
 		$(window).on('hashchange', function() {
 			var hash = window.location.hash;
 			if(hash.indexOf('#/') == 0) {
@@ -36,6 +37,10 @@
 			return matches[1];
 		},
 		'handler': function (issueId) {
+			$('a.permalink').popover('hide');
+			// Clean components selection
+			lookup('#components').chosen().val('').trigger("chosen:updated");
+
 			this.permlinked = issueId;
 			this.permlinkedType = 'issue';
 			this.filterIssuesWithOnly(issueId);
@@ -46,12 +51,15 @@
 			return matches[1];
 		},
 		'handler': function(versionId) {
+			$('a.permalink').popover('hide');
+			// Clean components selection
+			lookup('#components').chosen().val('').trigger('chosen:update');
+
 			this.permlinked = versionId;
 			this.permlinkedType = 'version';
-			// Open appropriate LTS
+			// TODO Open appropriate LTS
 			// Trigger click
-			$('a[data-version='+ versionId +']').click();
-			//this.filterIssuesByVersion(versionId);
+			$('#versions a[data-version='+ versionId +']').click();
 		}
 	}];
 
@@ -139,7 +147,7 @@
 	// This directive automatically add an 'attachments' property on the available issue for the current scope
 	.directive('issueAttachments', function(jira, roadmap, $timeout) {
 	  return {
-	    compile: function(element, attributes) {
+	  	compile: function(element, attributes) {
 	    	return {
 	            pre: function(scope, element, attributes, controller, transcludeFn) {
 	            	// Cache the element in order to use it in the controller function
@@ -158,9 +166,20 @@
 	    	}
 
 	    	$timeout(function() {
-	    		// Set attachments loader img
-	    		$('div[data-issue='+ $scope.issue.id +']').find('.loader-container').nxloader('show');
+    			// Set attachments loader img
+    			$('div[data-issue='+ $scope.issue.id +']').find('.loader-container').nxloader('show');
 	    	});
+
+	    	
+	    	/*jira.checkAttachments($scope.issue.id, function(data, status, req) {
+	    		var contentLength = req.getResponseHeader('Content-Length');
+	    		console.debug(contentLength);
+
+	    		if(contentLength && contentLength <= 22) {
+	    			// We doesn't have attachments
+	    			return;
+	    		}
+	    	});*/
 
 	    	// Download attachments for the current issue
 			jira.getAttachments($scope.issue.id, function(files) {
@@ -215,17 +234,21 @@
 			link: function($scope, elm, attrs) {
 				if($scope.$last === true) {
 					$timeout(function() {
-						$('div[data-issue]').each(function(i, elm) {
+						$('.permalink').each(function(i, elm) {
 							var issueId = $(elm).data('issue');
-							$('#title-' + issueId).popover({
+							$(elm).popover({
+								container: 'body',
 								trigger: 'click',
 								html: true,
 								title: 'Permalink',
+								placement: 'bottom',
 								content: '<div class="form-group"> ' +
 				            		'<input size="27" type="text" onFocus="this.select()" class="form-control" value="'+ HOST +'/#/issues/'+ issueId +'">' +
 				        		'</div>'
+							}).on('show.bs.popover', function() {
+								$('.permalink').not(this).popover('hide');
 							});
-						});
+						})
 					});
 				}
 			}
@@ -258,6 +281,12 @@
 						'customfield_10900', 'customfield_10901', 'customfield_10904'
 					]
 				});
+			},
+			checkAttachments: function(issueId, callback) {
+				$.jira('checkAttachments', {
+					'url'   : JIRA_BASE_URL,
+					'issue' : issueId
+				}).done(callback);
 			},
 			getAttachments: function(issueId, callback, filter) {
 				$.jira('attachments', {
@@ -436,6 +465,8 @@
 
 			var selection = roadmap.getVersionSelection();
 			if(ltsId != selection.id) {
+				$('a.permalink').popover('hide');
+
 				$('.collapse.in').collapse('hide');
 				$('#collapse-' + ltsId).collapse('show');
 
@@ -468,9 +499,6 @@
 					return false; 
 				}
 			});
-
-			// Close current popover
-			//$('.popover').popover('destroy');
 
 			if(found === null) {
 				console.debug('Unable to find the permlinked issue ('+ issueId +') - filter by current LTS');
@@ -642,8 +670,8 @@
 
 		// Filter issues based on the current selection
 		$scope.$on(NXEVENT.FILTER_BY_SELECTION, function(event, versionSelection) {
-			// CLean hash
-			window.location.hash = '/';
+			// Clean hash
+			//window.location.hash = '/';
 
 			if($scope.issues === undefined) {
 				// Lazy set the issues in the scope

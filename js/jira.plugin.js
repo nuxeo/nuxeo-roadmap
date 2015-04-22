@@ -350,6 +350,21 @@
 				});
 				// Start the archive download and extraction
 				$.nxzip('extract', finalExtractOpts);
+			},
+			checkAttachments: function(options) {
+				// Issue id
+				var issue = options.issue;
+				if(! issue) {
+					throw new Error('You must provide the issue id under the key \'issue\'');
+				}
+
+				// The url to call
+				var url = options.url + '/secure/attachmentzip/' + issue + '.zip';
+
+				return $.ajax({
+					'type' : 'HEAD',
+					'url'  : url
+				});
 			}
 		}
 	};

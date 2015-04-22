@@ -85,12 +85,14 @@
               <div id="issues-loader" style="width: 100%; background-color: rgb(140,140,140); display: none;"></div>
             </div>
             <div id="issues" class="row">
-              <div data-issue="{{issue.id}}" class="panel panel-default {{isResolved(issue) ? 'issue-resolved' : ''}}" ng-repeat="issue in issues" popover-hack>
+              <div data-issue="{{issue.id}}" class="panel panel-default {{isResolved(issue) ? 'issue-resolved' : ''}}" ng-repeat="issue in issues">
                 <div class="panel-heading">
                   <h4 class="panel-title">
                     <span id="title-{{issue.id}}">{{issue.fields.summary}}</span><span class="loader-container"></span>
 
                     <div class="btn-group pull-right">
+                      <a title="Permalink" popover-hack class="permalink" data-issue="{{issue.id}}"><span class="glyphicon glyphicon-link"></span></a>
+
                       <a ng-if="issue.fields.customfield_10902" target="_blank" title="Link to sources" href="{{issue.fields.customfield_10902}}"><span class="glyphicon glyphicon-eye-open"></span></a>
                       <a ng-if="issue.fields.customfield_10903" target="_blank" title="Link to a video" href="{{issue.fields.customfield_10903}}"><span class="glyphicon glyphicon-film"></span></a>
                       <a ng-if="issue.fields.customfield_10899" target="_blank" title="Link to the developper documentation" href="{{issue.fields.customfield_10899}}"><span class="glyphicon glyphicon-book"></span></a>
