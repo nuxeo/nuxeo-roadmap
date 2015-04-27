@@ -165,13 +165,8 @@
 	    		return;
 	    	}
 
-	    	$timeout(function() {
-    			// Set attachments loader img
-    			$('div[data-issue='+ $scope.issue.id +']').find('.loader-container').nxloader('show');
-	    	});
-
-	    	
-	    	/*jira.checkAttachments($scope.issue.id, function(data, status, req) {
+	    	/*
+	    	jira.checkAttachments($scope.issue.id, function(data, status, req) {
 	    		var contentLength = req.getResponseHeader('Content-Length');
 	    		console.debug(contentLength);
 
@@ -179,10 +174,29 @@
 	    			// We doesn't have attachments
 	    			return;
 	    		}
-	    	});*/
+	    	});
+			*/
+
+			$timeout(function() {
+				// Set attachments loader img
+				$('div[data-issue='+ $scope.issue.id +']')
+					.find('.loader-container')
+					.nxloader('show');
+    		});
 
 	    	// Download attachments for the current issue
 			jira.getAttachments($scope.issue.id, function(files) {
+				if($.isEmptyObject(files)) {
+					console.log('No attachments - nothing to do');
+					$timeout(function() {
+						// Remove footer panel (which contains the loader)
+						$('div[data-issue='+ $scope.issue.id +']')
+							.find('.panel-footer')
+							.remove();
+					});
+					return;
+				}
+
 				var attachments = [];
 				for(var name in files) {
 					var file 		= files[name];
@@ -213,9 +227,12 @@
 				$scope.$evalAsync(function() {
 					$timeout(function() {
 						// Remove attachments loader img
-						$('div[data-issue='+ $scope.issue.id +']').find('.loader-container').nxloader('hide');
+						$('div[data-issue='+ $scope.issue.id +']')
+							.find('.loader-container')
+							.nxloader('hide');
+		    			$scope.issue.attachments = attachments;	
+
 					});
-	    			$scope.issue.attachments = attachments;
 					// Cache the attachments with the issue
 					if($scope.permlinked === $scope.issue.id) {
 						// Resize the popup if this issue is permlinked
