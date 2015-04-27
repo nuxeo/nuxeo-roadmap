@@ -544,6 +544,20 @@
 		$scope.trusted = function(input) {
 			return $sce.trustAsHtml(input);
 		};
+
+		$scope.cleanUri = function() {
+			if(window.location.hash) {	// Clean if we have a hash
+				if(history.replaceState) {
+					history.replaceState('', document.title, window.location.pathname);	
+				}
+				else if(history.pushState) {
+					history.pushState('', document.title, window.location.pathname);
+				}
+				else {
+					window.location.hash = '/';
+				}
+			}
+		};
 	})
 
 	// specific controllers
@@ -655,7 +669,7 @@
 				$scope.$apply(function() {
 					// Filter issues by priority, cache them and update scope
 					CACHE = $filter('priority')(collectedIssues);
-					if(window.location.hash) {
+					if(window.location.hash && window.location.hash != '/') {	// Ignore '/' hash
 						console.debug('We have a location hash - trigger hashchange');
 						// Trigger hashchange when versions and issues has been loaded
 						$(window).trigger('hashchange');
@@ -683,8 +697,7 @@
 
 		// Filter issues based on the current selection
 		$scope.$on(NXEVENT.FILTER_BY_SELECTION, function(event, versionSelection) {
-			// Clean hash
-			//window.location.hash = '/';
+			$scope.cleanUri();
 
 			if($scope.issues === undefined) {
 				// Lazy set the issues in the scope
