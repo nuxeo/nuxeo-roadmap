@@ -233,13 +233,6 @@
 		    			$scope.issue.attachments = attachments;	
 
 					});
-					// Cache the attachments with the issue
-					if($scope.permlinked === $scope.issue.id) {
-						// Resize the popup if this issue is permlinked
-						$timeout(function() {
-							$.colorbox.resize();
-						});
-					}
 				});
 			}, ATTACHMENTS_FILTER);
 	    }
@@ -649,6 +642,9 @@
 							return function() {
 								var args = arguments;
 								$timeout(function() {
+									// Deselect FT
+									lookup('a[data-version]').removeClass('active');
+									console.debug('FT unselected');
 									route.handler.apply($scope.$parent, args);
 								});
 							};
