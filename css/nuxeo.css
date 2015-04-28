@@ -307,3 +307,12 @@ a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.acti
   margin: auto;
   clear: both;
 }
+
+.issue-bullet {
+  margin-left: -10px;
+  line-height: 44px;
+}
+
+#collapse-issues {
+  cursor: pointer;
+}

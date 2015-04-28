@@ -135,6 +135,20 @@
 		'pdf': '/img/contenttypes/pdf.png'
 	};
 
+	// Flag for the collapse issues button
+	var COLLAPSE_ISSUES_STATE = 'open';
+
+	// Custom status field img mapping
+	var ISSUE_CUSTOM_STATUS_FIELD = 'customfield_11090';
+	var ISSUE_CUSTOM_STATUS_IMG_MAPPING = {
+		'Rough': 'img/bullets/orange.png',
+		'Moderate': 'img/bullets/orange.png',
+		'Glassy': 'img/bullets/green.png',
+
+		// Fallback img
+		'_DEFAULT_': 'img/bullets/green.png',
+		'_IF_NOT_FOUND_': 'img/bullets/white.png'
+	};
 
 	// Roadmap module
 	angular.module('nxroadmap', [])
@@ -164,18 +178,6 @@
 	    		console.log('files are already present');
 	    		return;
 	    	}
-
-	    	/*
-	    	jira.checkAttachments($scope.issue.id, function(data, status, req) {
-	    		var contentLength = req.getResponseHeader('Content-Length');
-	    		console.debug(contentLength);
-
-	    		if(contentLength && contentLength <= 22) {
-	    			// We doesn't have attachments
-	    			return;
-	    		}
-	    	});
-			*/
 
 			$timeout(function() {
 				// Set attachments loader img
@@ -288,7 +290,8 @@
 					'fields'	: [
 						'fixVersions', 'components', 'priority', 'description', 'summary', 'status',
 						'customfield_10902', 'customfield_10903', 'customfield_10899',
-						'customfield_10900', 'customfield_10901', 'customfield_10904'
+						'customfield_10900', 'customfield_10901', 'customfield_10904',
+						ISSUE_CUSTOM_STATUS_FIELD
 					]
 				});
 			},
@@ -443,6 +446,20 @@
 
 	// Base controller
 	.controller('root', function($scope, $sce, roadmap, $timeout) {
+		$timeout(function() {
+			$('#collapse-issues').click(function() {
+				if(COLLAPSE_ISSUES_STATE === 'open') {
+					$('div[data-issue]').find('.panel-body, .panel-footer').slideUp();
+					COLLAPSE_ISSUES_STATE = 'close';
+				}
+				else if(COLLAPSE_ISSUES_STATE === 'close') {
+					$('div[data-issue]').find('.panel-body, .panel-footer').slideDown();
+					COLLAPSE_ISSUES_STATE = 'open';
+				}
+			});
+		});
+
+
 		$scope.filterIssuesByVersion = function(versionId) {
 			// Short circuit the broadcasts if the clicked version is already selected
 			if(versionId === roadmap.getVersionSelection().id) {
@@ -593,6 +610,33 @@
 	})
 
 	.controller('issues', function($scope, $filter, $timeout, roadmap, jira) {
+		$scope.imgForIssueCustomStatusField = function(issue) {
+			var statusObj = issue.fields[ISSUE_CUSTOM_STATUS_FIELD];
+			if(statusObj) {
+				var value = statusObj.value;
+				var img = ISSUE_CUSTOM_STATUS_IMG_MAPPING[value];
+				if(img) {
+					return img;
+				}
+				else {
+					return ISSUE_CUSTOM_STATUS_IMG_MAPPING['_IF_NOT_FOUND_'];
+				}
+			}
+
+			return ISSUE_CUSTOM_STATUS_IMG_MAPPING['_DEFAULT_'];
+		};
+		$scope.issueCustomIssueFieldIsPresent = function(issue) {
+			return typeof(issue.fields[ISSUE_CUSTOM_STATUS_FIELD]) === 'object';
+		};
+		$scope.issueCustomFieldValue = function(issue) {
+			try {
+				return issue.fields[ISSUE_CUSTOM_STATUS_FIELD].value;
+			}
+			catch(e) {
+				return 'Glassy';
+			}
+		};
+
 		$scope.$on(NXEVENT.VERSION_CLICK, function(event, versionId) {
 			// Remove the class active on the previously selected ft
 			lookup('a[data-version]').removeClass('active');
