@@ -682,11 +682,6 @@
 		});
 
 		$scope.$on(NXEVENT.FILTER_FOR_ONLY, function(event, issueId) {
-			if($scope.issues === undefined) {
-				// Lazy set the issues in the scope
-				$scope.issues = CACHE;
-			}
-
 			$timeout(function() {
 				// Reduce the displayed issues based on a selection
 				$scope.issues = $filter('reduce')(CACHE, $scope.versions, {	// Selection
@@ -698,11 +693,6 @@
 		// Filter issues based on the current selection
 		$scope.$on(NXEVENT.FILTER_BY_SELECTION, function(event, versionSelection) {
 			$scope.cleanUri();
-
-			if($scope.issues === undefined) {
-				// Lazy set the issues in the scope
-				$scope.issues = CACHE;
-			}
 
 			var selection = null;
 			if(versionSelection) {
