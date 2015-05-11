@@ -189,7 +189,7 @@
 	    	// Download attachments for the current issue
 			jira.getAttachments($scope.issue.id, function(files) {
 				if($.isEmptyObject(files)) {
-					console.log('No attachments - nothing to do');
+					//console.log('No attachments - nothing to do');
 					$timeout(function() {
 						// Remove footer panel (which contains the loader)
 						$('div[data-issue='+ $scope.issue.id +']')
@@ -229,6 +229,7 @@
 				$scope.$evalAsync(function() {
 					$timeout(function() {
 						// Remove attachments loader img
+						console.debug('Remove attachments loader');
 						$('div[data-issue='+ $scope.issue.id +']')
 							.find('.loader-container')
 							.nxloader('hide');
@@ -523,7 +524,7 @@
 				// Match on id or key
 				if(issue.id == issueId || issue.key == issueId) {
 					found = issue;
-					return false; 
+					return false;
 				}
 			});
 
@@ -657,11 +658,17 @@
 	        });
 		};
 
+		$scope.collapseIssue = function(issue) {
+			$timeout(function() {
+				$('div[data-issue='+ issue.id +']').find('.panel-body, .panel-footer').slideToggle();
+			});
+		};
+
 		$scope.$on(NXEVENT.VERSIONS_LOADED, function(event, versions) {
 			$scope.versions = VERSIONS = versions;
 
 			var callbacks = [];
-			// Prepare an array of deferred which old issues querying for one LTS and it's associated FTs
+			// Prepare an array of deferred which old issues querying for one LTS and it's associated FTsdebug()
 			for(var vId in versions.versionsIds) {
 				var ids = versions.versionsIds[vId];
 				ids.push(vId);

@@ -100,7 +100,7 @@
                 <div class="panel-heading">
                   <h4 class="panel-title">
                     <img class="issue-bullet" height="24" src="{{imgForIssueCustomStatusField(issue)}}" ng-if="issueCustomIssueFieldIsPresent(issue)" title="{{issueCustomFieldValue(issue)}}"/>
-                    <span id="title-{{issue.id}}">{{issue.fields.summary}}</span>
+                    <span id="title-{{issue.id}}" ng-click="collapseIssue(issue)">{{issue.fields.summary}}</span>
 
                     <div class="btn-group pull-right">
                       <a title="Permalink" popover-hack class="permalink" data-issue="{{issue.id}}"><span class="glyphicon glyphicon-link"></span></a>

@@ -316,3 +316,7 @@ a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.acti
 #collapse-issues {
   cursor: pointer;
 }
+
+#issues div .panel-title span {
+  cursor: pointer;
+}

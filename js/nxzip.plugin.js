@@ -9,12 +9,15 @@
  */
 
 (function($) {
+
+    var traceError = false;
+
     // Utility functions
     var functions = {
         // Safely get options
         getOptions: function(options) {
             return $.extend({
-                // 
+                //
             }, options);
         },
         // Exposed for the jquery 'zip' plugin
@@ -47,7 +50,20 @@
                     }
 
                     // Create a new jszip instance in order to read the archive
-                    var zip     = new JSZip(data);
+                    var zip = null;
+                    try {
+                        zip = new JSZip(data);
+                    }
+                    catch(e) {  // Fix exception thrown in Firefox
+                        if(traceError === true) {   // Conditionnal tracing - avoid console pollution
+                            console.log('Error jszip');
+                            console.debug(e);
+                        }
+
+                        callback({});
+                        return;
+                    }
+
                     // The final files which will be passed to the callback
                     var files   = {};
                     // A filter that can reduce the files that will be passed to the callback
