@@ -99,7 +99,7 @@
               <div data-issue="{{issue.id}}" class="panel panel-default {{isResolved(issue) ? 'issue-resolved' : ''}}" ng-repeat="issue in issues">
                 <div class="panel-heading">
                   <h4 class="panel-title">
-                    <img class="issue-bullet" height="24" src="{{imgForIssueCustomStatusField(issue)}}" ng-if="issueCustomIssueFieldIsPresent(issue)" title="{{issueCustomFieldValue(issue)}}"/>
+                    <img class="issue-bullet" height="24" ng-attr-src="{{imgForIssueCustomStatusField(issue)}}" ng-if="issueCustomIssueFieldIsPresent(issue)" title="{{issueCustomFieldValue(issue)}}"/>
                     <span id="title-{{issue.id}}" ng-click="collapseIssue(issue)">{{issue.fields.summary}}</span>
 
                     <div class="btn-group pull-right">
@@ -125,7 +125,7 @@
                     href="{{attachment.url}}" ng-class="attachment.image ? 'img-issue-' + issue.id : ''"
                     ng-attr-target="{{attachment.image ? '' : '_blank'}}" ng-click="showImage($event, issue.id)"
                     ng-repeat="attachment in issue.attachments">
-                      <img style="margin-right: 5px" height="64" src="{{attachment.thumb}}">
+                      <img style="margin-right: 5px" height="64" ng-attr-src="{{attachment.thumb}}">
                   </a>
                   </div>
                 </div>
