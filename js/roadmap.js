@@ -460,7 +460,6 @@
 			});
 		});
 
-
 		$scope.filterIssuesByVersion = function(versionId) {
 			// Short circuit the broadcasts if the clicked version is already selected
 			if(versionId === roadmap.getVersionSelection().id) {
@@ -726,7 +725,16 @@
 						$(window).trigger('hashchange');
 					}
 					else {
-						$scope.filterIssuesByCurrentLTS();
+						//TOOD - Check who has the current marker and smart filter
+						if(versions.currentIsLTS) {
+							$scope.filterIssuesByCurrentLTS();
+						}
+						else {
+							var versionId = versions.activeVersionId;
+							var associatedLTS = versions.getLTS(versionId);
+							$('#collapse-' + associatedLTS).collapse('show');
+							$scope.filterIssuesByVersion(versionId);
+						}
 					}
 				});
 			});

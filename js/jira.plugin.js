@@ -137,12 +137,13 @@
         self = this;
         self.activeVersionId = null;
 
+        var currentDate  = new Date();
+
         // Filter versions
         data = $.grep(data, function(version, i) {
         	version.jsDate = new Date(version.releaseDate);
 			version.is_lts = version.name.indexOf('LTS') === 0;
 
-            var currentDate  = new Date();
             var startingDate = null;
 
             /*
@@ -173,9 +174,10 @@
                 var isToday = version.jsDate.getMonth() === currentDate.getMonth()
                 				&& version.jsDate.getFullYear() === currentDate.getFullYear()
                 				&& version.jsDate.getDate() === currentDate.getDate();
-                if(startingDate <= currentDate && currentDate <= version.jsDate || isToday) {
+                if((startingDate <= currentDate && currentDate <= version.jsDate) || isToday) {
                     version.current = true;
                     self.activeVersionId = version.id;
+                    self.currentIsLTS = version.is_lts;
                 }
             }
 
@@ -232,8 +234,8 @@
                 self.versions[version.id] 	 = versions.reverse();
                 self.versionsIds[version.id] = versionsIds;
 
-                // Check active version id lts - and if found set the lts panel type to info because it contains the active FT
-                if($.inArray(self.activeVersionId, versionsIds) !== -1) {
+                // Check if this LTS is the current or else check the active version id lts - if found set the lts panel type to info because it contains the active FT
+                if(version.current || $.inArray(self.activeVersionId, versionsIds) !== -1) {
                     version.panel = 'info';
                 }
             }
@@ -243,7 +245,7 @@
         delete this.data;
     };
     Versions.prototype.isDisplayableVersion = function(version) {
-            return ! version.archived && (version.name.indexOf("LTS") === 0 || version.name.indexOf("FT")  === 0);
+        return ! version.archived && (version.name.indexOf("LTS") === 0 || version.name.indexOf("FT")  === 0);
 	};
 	Versions.prototype.getLTS = function(versionId) {
 		for(var key in this.versions) {
