@@ -154,13 +154,13 @@
             	// Get the previous version
             	var prevVersion = data[i - 1];
 	            if (prevVersion) {
-	            	startingDate =  new Date(prevVersion.jsDate.getFullYear(), prevVersion.jsDate.getMonth(), prevVersion.jsDate.getDate() + 1);
+	            	startingDate = new Date(prevVersion.jsDate.getFullYear(), prevVersion.jsDate.getMonth(), prevVersion.jsDate.getDate() + 1);
 	        	}
         	}
         	catch(e) {}	// Catch data[i - 1] out of bounds error
         	finally {
         		if(!startingDate) {
-        			startingDate =  new Date(version.jsDate.getFullYear(), version.jsDate.getMonth() - 2, version.jsDate.getDate() + 1);
+					startingDate =  new Date(version.jsDate.getFullYear(), version.jsDate.getMonth() - 2, version.jsDate.getDate() + 1);
         		}
         	}
 
@@ -169,18 +169,11 @@
             }
             else {
                 version.panel = 'warning';
-                if(startingDate <= currentDate && currentDate <= version.jsDate) {
-                    version.current = true;
-                    self.activeVersionId = version.id;
-                }
-            }
-
-            if(version.released && version.is_lts) {
-                version.panel = 'success';
-            }
-            else {
-                version.panel = 'warning';
-                if(startingDate <= currentDate && currentDate <= version.jsDate) {
+                // If today match the end of the relase force the version to be the current
+                var isToday = version.jsDate.getMonth() === currentDate.getMonth()
+                				&& version.jsDate.getFullYear() === currentDate.getFullYear()
+                				&& version.jsDate.getDate() === currentDate.getDate();
+                if(startingDate <= currentDate && currentDate <= version.jsDate || isToday) {
                     version.current = true;
                     self.activeVersionId = version.id;
                 }
