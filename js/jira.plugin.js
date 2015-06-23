@@ -170,10 +170,6 @@
         		}
         	}
 
-			console.log('--- '+ version.name +' ---');
-        	console.debug(startingDate);
-        	console.debug(version.jsDate);
-
             if(version.released && version.is_lts) {
                 version.panel = 'success';
             }
