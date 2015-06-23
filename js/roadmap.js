@@ -31,6 +31,7 @@
 		});
 	}
 
+	var TEAMS_INIT = false;	// Hack to ensure that the chosen has been called on the teams select - if not the chosen is called to get the value and create an empty chosen 
 	var ROUTES = [{
 		'pattern': /^issues\/(.*)/,
 		'binder' : function(matches) {
@@ -138,6 +139,7 @@
 	// Flag for the collapse issues button
 	var COLLAPSE_ISSUES_STATE = 'open';
 
+	var ISSUE_TEAMS_FIELD = 'customfield_11190';
 	// Custom status field img mapping
 	var ISSUE_CUSTOM_STATUS_FIELD = 'customfield_11090';
 	var ISSUE_CUSTOM_STATUS_IMG_MAPPING = {
@@ -292,7 +294,7 @@
 						'fixVersions', 'components', 'priority', 'description', 'summary', 'status',
 						'customfield_10902', 'customfield_10903', 'customfield_10899',
 						'customfield_10900', 'customfield_10901', 'customfield_10904',
-						ISSUE_CUSTOM_STATUS_FIELD
+						ISSUE_CUSTOM_STATUS_FIELD, ISSUE_TEAMS_FIELD
 					]
 				});
 			},
@@ -337,6 +339,14 @@
 
 				return selection;
 			},
+			getTeamsSelection: function() {
+				if(TEAMS_INIT) {
+					return lookup('#teams').chosen().val();
+				}
+				else {
+					return null;
+				}
+			},
 			getComponentsSelection: function() {
 				return lookup('#components').chosen().val();
 			},
@@ -344,7 +354,8 @@
 			getSelection: function() {
 				return {
 					version 	: this.getVersionSelection(),
-					components 	: this.getComponentsSelection()
+					components 	: this.getComponentsSelection(),
+					teams 		: this.getTeamsSelection()
 				}
 			}
 		};
@@ -383,10 +394,12 @@
 						return [issue];	// Found issue - return it
 					}
 				}
-				console.log('Issue ' +issueId+ ' not found');
+				console.warn('Issue '+ issueId +' not found');
 				return [];
 			}
 
+			// Teams to filter
+			var teams = selection.teams || [];
 			// Components to filter
 			var components 	= selection.components || [];
 			// Versions to filter
@@ -401,10 +414,14 @@
 				var issue 			= issues[i];
 				var fixVersionsIds 	= [];
 				var issueComponents = [];
-				var checkVersion 	= ! selection.version;
-				var checkCmps 	 	= ! selection.components;
+				var issueTeams 		= [];
 
-				if(! checkVersion) {
+				var checkTeams 	 = !selection.teams;
+				var checkVersion = !selection.version;
+				var checkCmps 	 = !selection.components;
+
+				// Filter on versions
+				if(!checkVersion) {
 					if(issue.fields.fixVersions) {
 						for(var i in issue.fields.fixVersions) {
 							fixVersionsIds.push(issue.fields.fixVersions[i].id);
@@ -420,7 +437,8 @@
 					}
 				}
 
-				if(! checkCmps) {
+				// Filter on components
+				if(!checkCmps) {
 					for(var j in issue.fields.components) {
 						issueComponents.push(issue.fields.components[j].id);
 					}
@@ -436,7 +454,26 @@
 					}
 				}
 
-				if(checkVersion === true && checkCmps === true) {
+				// Filter on teams
+				if(!checkTeams) {
+					if(issue.fields[ISSUE_TEAMS_FIELD]) {
+						for(var m in issue.fields[ISSUE_TEAMS_FIELD]) {
+							issueTeams.push(issue.fields[ISSUE_TEAMS_FIELD][m].id);
+						}
+					}
+
+					if(issueTeams) {
+						for(var n in teams) {
+							var team = teams[n];
+							if($.inArray(team, issueTeams) !== -1) {
+								checkTeams = true;
+								break;
+							}
+						}
+					}
+				}
+
+				if(checkVersion === true && checkCmps === true && checkTeams === true) {
 					filtereds.push(issue);
 				}
 			}
@@ -459,6 +496,20 @@
 				}
 			});
 		});
+
+		$scope.toggleFilterIssuesByVersion = function(versionId) {
+			// Short circuit the broadcasts if the clicked version is already selected
+			if(versionId === roadmap.getVersionSelection().id) {
+				console.log('Version already selected');
+				var ltsId = VERSIONS.getLTS(versionId);
+				$('#versions .active').removeClass('active').blur();
+				$scope.forceFilterIssuesByLts(ltsId);
+				return;
+			}
+
+			$scope.$broadcast(NXEVENT.VERSION_CLICK, versionId);
+			$scope.$broadcast(NXEVENT.FILTER_BY_SELECTION);
+		};
 
 		$scope.filterIssuesByVersion = function(versionId) {
 			// Short circuit the broadcasts if the clicked version is already selected
@@ -483,7 +534,14 @@
 			$scope.$broadcast(NXEVENT.FILTER_BY_SELECTION);
 		};
 
-		//TODO : Fix incoherence
+		$scope.forceFilterIssuesByLts = function(ltsId)  {
+			// Force to use a version selection in order to avoid weird behavior when a LTS is selected
+			$scope.$broadcast(NXEVENT.FILTER_BY_SELECTION, {
+				lts: true,
+				id : ltsId
+			});
+		};
+
 		$scope.filterIssuesByLts = function(ltsId, clear, callback) {
 			// If clear is set to true then unselect the current active ft version
 			if(clear === true) {
@@ -493,20 +551,26 @@
 			var selection = roadmap.getVersionSelection();
 			if(ltsId != selection.id) {
 				$('a.permalink').popover('hide');
-
 				$('.collapse.in').collapse('hide');
 				$('#collapse-' + ltsId).collapse('show');
 
-				// Force to use a version selection in order to avoid weird behavior when a LTS is selected
-				$scope.$broadcast(NXEVENT.FILTER_BY_SELECTION, {
-					lts: true,
-					id : ltsId
-				});
+				$scope.forceFilterIssuesByLts(ltsId);
 			}
 
 			if(typeof callback === 'function') {
 				callback(ltsId == selection.id);
 			}
+		};
+
+		$scope.filterIssuesByTeams = function() {
+			$scope.$broadcast(NXEVENT.FILTER_BY_SELECTION);
+		};
+
+		$scope.filterIssuesByTeam = function(team) {
+			// Emulate teams selection
+			lookup('#teams')
+				.val(team)
+				.trigger('chosen:updated').change();
 		};
 
 		$scope.filterIssuesByCurrentLTS = function() {
@@ -637,6 +701,10 @@
 			}
 		};
 
+		$scope.getTeams = function(issue) {
+			return issue.fields[ISSUE_TEAMS_FIELD] || [];
+		};
+
 		$scope.$on(NXEVENT.VERSION_CLICK, function(event, versionId) {
 			// Remove the class active on the previously selected ft
 			lookup('a[data-version]').removeClass('active');
@@ -679,6 +747,7 @@
 			$.when.apply($, callbacks).done(function() {
 				// Will hold the results (issues) of each http call to jira
 				var collectedIssues = [];
+				var teams = [];
 
 				// Collect the LTS call response data in one array (collectedIssues)
 				for(var i in arguments) {
@@ -687,9 +756,49 @@
 						throw new Error('The request for the jira issues request respond with status ' + params[2].statusText);
 					}
 
+					// Set teams
+					var issues = params[0].issues;
+					for(var j in issues) {
+						var issue = issues[j];
+						var issueTeams = issue.fields[ISSUE_TEAMS_FIELD];
+
+						if(!issueTeams) {
+							continue;
+						}
+
+						for(var k in issueTeams) {
+							var team = issueTeams[k];
+
+							// Check teams entry duplicate
+							var push = true;
+							for(var tidx in teams) {
+								if(teams[tidx].id === team.id) {
+									push = false;
+								}
+							}
+
+							if(push) {
+								teams.push({
+									id: team.id,
+									label: team.value
+								});
+							}
+						}
+					}
+
 					// Merge the current issues data with the old one
-					collectedIssues = $.merge(params[0].issues, collectedIssues);
+					collectedIssues = $.merge(issues, collectedIssues);
 				}
+
+				$scope.teams = teams;
+				$timeout(function() {
+					lookup('#teams').chosen({
+						placeholder_text_multiple: 'Select team(s) for issues filtering'
+					}).change(function() {
+						$scope.filterIssuesByTeams();
+					});
+					TEAMS_INIT = true;
+				});
 
 				// Hide the issues loader
 				lookup(ISSUE_LOADER_SELECTOR, true).nxloader('hide', {

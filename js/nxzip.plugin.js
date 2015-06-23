@@ -70,7 +70,6 @@
                     var filter  = options.filter;
                     // A filter in any object that has a 'test' method
                     if(filter && typeof filter.test === 'function') {
-                        console.log('A filter has been detected ... process filter');
                         // Iter on each files and check the filter
                         for(var i in zip.files) {
                             var file = zip.files[i];

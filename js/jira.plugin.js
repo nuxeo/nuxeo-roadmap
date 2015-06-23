@@ -144,6 +144,11 @@
         	version.jsDate = new Date(version.releaseDate);
 			version.is_lts = version.name.indexOf('LTS') === 0;
 
+			// Abort if the release date isn't provided
+			if(isNaN(version.jsDate.getTime())) {
+	    		return false;
+        	}
+
             var startingDate = null;
 
             /*
@@ -164,6 +169,10 @@
 					startingDate =  new Date(version.jsDate.getFullYear(), version.jsDate.getMonth() - 2, version.jsDate.getDate() + 1);
         		}
         	}
+
+			console.log('--- '+ version.name +' ---');
+        	console.debug(startingDate);
+        	console.debug(version.jsDate);
 
             if(version.released && version.is_lts) {
                 version.panel = 'success';
