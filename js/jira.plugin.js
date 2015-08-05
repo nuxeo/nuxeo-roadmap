@@ -146,7 +146,7 @@
 
 			// Abort if the release date isn't provided
 			if(isNaN(version.jsDate.getTime())) {
-				if !(version.name=='Ideas'||version.name=='Delayed'){
+				if (version.name!=='Ideas'||version.name!=='Delayed'){
 	    		return false;
 				}
         	}
