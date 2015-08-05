@@ -142,13 +142,13 @@
         // Filter versions
         data = $.grep(data, function(version, i) {
         	version.jsDate = new Date(version.releaseDate);
-			version.is_lts = version.name.indexOf('LTS') === 0||version.name=='Ideas'||version.name=='Delayed';
+			version.is_lts = version.name.indexOf('LTS') === 0||version.name.indexOf('Ideas')===0||version.name.indexOf('Delayed')==='0';
 
 			// Abort if the release date isn't provided
 			if(isNaN(version.jsDate.getTime())) {
-				if (version.name!=='Ideas'||version.name!=='Delayed'){
+				
 	    		return false;
-				}
+			
         	}
 
             var startingDate = null;
