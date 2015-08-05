@@ -137,7 +137,7 @@
 	};
 
 	// Flag for the collapse issues button
-	var COLLAPSE_ISSUES_STATE = 'open';
+	var COLLAPSE_ISSUES_STATE = 'close';
 
 	var ISSUE_TEAMS_FIELD = 'customfield_11190';
 	// Custom status field img mapping
