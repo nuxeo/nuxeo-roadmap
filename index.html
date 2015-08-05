@@ -102,7 +102,7 @@
             </div>
             <div id="issues" class="row">
               <div data-issue="{{issue.id}}" class="panel panel-default {{isResolved(issue) ? 'issue-resolved' : ''}}" ng-repeat="issue in issues">
-                <div class="panel-heading panel-collapse collapse">
+                <div class="panel-heading">
                   <h4 class="panel-title">
                     <img class="issue-bullet" height="24" ng-attr-src="{{imgForIssueCustomStatusField(issue)}}" ng-if="issueCustomIssueFieldIsPresent(issue)" title="{{issueCustomFieldValue(issue)}}"/>
                     <span id="title-{{issue.id}}" ng-click="collapseIssue(issue)">{{issue.fields.summary}}</span>
