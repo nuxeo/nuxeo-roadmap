@@ -58,14 +58,14 @@
               <div class="panel-heading" role="tab" id="heading-{{version.id}}">
                 <h4 class="panel-title">
                   <a ng-click="filterIssuesByLts(version.id, true)" data-toggle="collapse" data-parent="#accordion" href="" data-target="#collapse-{{version.id}}" aria-expanded="true">
-                    {{version.name}} <span class="badge">{{version.jsDate | date: 'longDate' }}</span> <span class="badge" ng-if="version.current">current</span>
+                    {{version.name}} <span ng-if ="!(version.jsDate=='Invalid Date')" class="badge">{{version.jsDate | date: 'longDate' }}</span> <span class="badge" ng-if="version.current">current</span>
                   </a>
                 </h4>
               </div>
               <div id="collapse-{{version.id}}" class="panel-collapse collapse" role="tabpanel">
                 <div class="panel-body list-group">
                   <a href="" data-version="{{ft.id}}" ng-click="toggleFilterIssuesByVersion(ft.id, true)" class="list-group-item" ng-repeat="ft in versions.getVersions(version.id)">
-                    {{ft.name}} <span class="badge">{{ft.jsDate | date: 'longDate' }}</span> <span class="glyphicon glyphicon-ok" ng-if="ft.released"></span> <span class="badge" ng-if="ft.current">current</span>
+                    {{ft.name}} <span  class="badge">{{ft.jsDate | date: 'longDate' }}</span> <span class="glyphicon glyphicon-ok" ng-if="ft.released"></span> <span class="badge" ng-if="ft.current">current</span>
                   </a>
                 </div>
               </div>

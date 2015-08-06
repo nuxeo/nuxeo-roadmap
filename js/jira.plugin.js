@@ -141,26 +141,36 @@
 
         // Filter versions
         data = $.grep(data, function(version, i) {
-        	version.jsDate = new Date(version.releaseDate);
-			version.is_lts = version.name.indexOf('LTS') == 0||version.name.indexOf('Ideas')==0||version.name.indexOf('Delayed')=='0';
+        	
 
+        	version.jsDate = new Date(version.releaseDate);
+        	version.is_lts = version.name.indexOf('LTS') == 0||version.name.indexOf('Ideas')==0||version.name.indexOf('Soon Scheduled')=='0';
+
+			
 			// Abort if the release date isn't provided
-			if(isNaN(version.jsDate.getTime())) {
+			
+			if (!version.is_lts){
+				
+
+				if (isNaN(version.jsDate.getTime() )){
+					console.log(version.name +" has been removed");
 				
 	    		return false;
-			
-        	}
+	    		}
+	
+       }
 
             var startingDate = null;
 
             /*
              * Set the startingDate to the last version release date + 1 day
-             * If the checked version is the first (then we doesn't have a last version) the starting date will be the current released date - 2 month + 1 day
+             * If the checked version is the first (then we don't have a last version) the starting date will be the current released date - 2 month + 1 day
              *
              */
             try {
             	// Get the previous version
             	var prevVersion = data[i - 1];
+
 	            if (prevVersion) {
 	            	startingDate = new Date(prevVersion.jsDate.getFullYear(), prevVersion.jsDate.getMonth(), prevVersion.jsDate.getDate() + 1);
 	        	}
@@ -175,9 +185,12 @@
             if(version.released && version.is_lts) {
                 version.panel = 'success';
             }
+            else if (version.name =="Ideas"||version.name=="Soon Scheduled") {version.panel='default'}
+
             else {
                 version.panel = 'warning';
                 // If today match the end of the relase force the version to be the current
+               
                 var isToday = version.jsDate.getMonth() === currentDate.getMonth()
                 				&& version.jsDate.getFullYear() === currentDate.getFullYear()
                 				&& version.jsDate.getDate() === currentDate.getDate();
@@ -208,8 +221,28 @@
     Versions.prototype.load = function() {
         // Sort versions based on the releaseDate field
         this.data.sort(function(x, y) {
-            return x.jsDate - y.jsDate;
+        	console.log(x.name+ " & "+y.name);
+
+ if (x.name=="Soon Scheduled" && y.name=="Ideas") return -1;
+ if (y.name=="Soon Scheduled" && x.name=="Ideas") return 1;
+             
+            if ((x.jsDate - y.jsDate)){console.log("case1");
+
+
+            return  x.jsDate - y.jsDate;
+        }
+            if ( (x.jsDate =="Invalid Date") && (y.jsDate !=="Invalid Date")){
+            	console.log("case2");
+            	; return 1;
+            }
+            if ( (x.jsDate !=="Invalid Date") &&(y.jsDate =="Invalid Date")){
+            	console.log("case3");
+            	
+            	 return -1;
+            }
+           
         });
+        
 
         var self = this;
         $.each(this.data, function(idx, version) {
@@ -218,6 +251,7 @@
 
             if(version.is_lts) {
                 self.lts.push(version);
+                
 
                 var versions = [];
                 var versionsIds = [];
@@ -232,6 +266,7 @@
                     // Collect the version
                     versions.push(subVersion);
                     versionsIds.push(subVersion.id);
+
                 };
 
                 /* 
@@ -240,6 +275,7 @@
                  */
                 self.versions[version.id] 	 = versions.reverse();
                 self.versionsIds[version.id] = versionsIds;
+           
 
                 // Check if this LTS is the current or else check the active version id lts - if found set the lts panel type to info because it contains the active FT
                 if(version.current || $.inArray(self.activeVersionId, versionsIds) !== -1) {
@@ -252,7 +288,7 @@
         delete this.data;
     };
     Versions.prototype.isDisplayableVersion = function(version) {
-        return ! version.archived && (version.name.indexOf("LTS") === 0 || version.name.indexOf("FT")  === 0);
+        return ! version.archived && (version.name.indexOf("LTS") === 0 || version.name.indexOf("FT")  === 0 ||version.name.indexOf("Ideas")||version.name.indexOf("Soon Scheduled"));
 	};
 	Versions.prototype.getLTS = function(versionId) {
 		for(var key in this.versions) {
